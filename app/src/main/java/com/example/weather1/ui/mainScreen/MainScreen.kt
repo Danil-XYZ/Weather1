@@ -72,3 +72,36 @@ fun MainViewScreen() {
         }
     }
 }
+
+@Composable
+fun TopBarRow(){
+    Row() {
+
+        Icon(
+            modifier = Modifier
+                .background(
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(100)
+                )
+                .clip(RoundedCornerShape(100))
+                .clickable { },
+            painter = painterResource(id = R.drawable.ic_baseline_add_24),
+            contentDescription = null,
+            tint = Color.White
+        )
+
+        Text(
+            text = "Mocow",
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+
+        Icon(
+            modifier = Modifier.clickable {  },
+            painter = painterResource(id = R.drawable.ic_baseline_more_vert_24),
+            contentDescription = null,
+            tint = Color.White
+        )
+
+    }
+}
