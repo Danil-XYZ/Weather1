@@ -11,7 +11,8 @@ private val DarkColorPalette = darkColors(
     primary = Purple200,
     primaryVariant = Purple700,
     secondary = Teal200,
-    secondaryVariant = Red200
+    secondaryVariant = Red200,
+    onBackground = White
 
 )
 
@@ -19,7 +20,8 @@ private val LightColorPalette = lightColors(
     primary = Purple500,
     primaryVariant = Purple700,
     secondary = Teal200,
-    background = Grey200
+    background = Grey200,
+    onBackground = White
 
 
     /* Other default colors to override
