@@ -3,6 +3,7 @@ package com.example.weather1
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,21 +20,38 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.findNavController
 import com.example.weather1.ui.NavigationHost
+import com.example.weather1.ui.RootState
+import com.example.weather1.ui.RootViewModel
 import com.example.weather1.ui.components.DrawerPanel
 import com.example.weather1.ui.components.MenuItems
 import com.example.weather1.ui.components.TopBarRow
 import com.example.weather1.ui.mainScreen.MainViewScreen
 import com.example.weather1.ui.theme.Weather1Theme
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    val vm: RootViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
 
+            val state: RootState by vm.state.collectAsState()
             val scope = rememberCoroutineScope()
             val scaffoldState = rememberScaffoldState()
             val navController = rememberNavController()
+
+
+            LaunchedEffect(key1 = Unit){
+                launch {
+                    navController.currentBackStackEntryFlow.collectLatest {
+                        //vm.updateRout(it.destination.route)
+                        it.destination.route?.let { it1 -> vm.updateRout(it1) }
+                    }
+                }
+            }
 
             Weather1Theme {
 
@@ -42,7 +60,7 @@ class MainActivity : ComponentActivity() {
                     .background(Color.Black)
                 ) {
 
-                    if (navController.currentDestination?.route == "MainScreen") {
+                    if (state.currentRoute == "MainScreen") {
                         Image(
                             painter = painterResource(id = R.drawable.img),
                             contentDescription = null,
