@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Weather1</string>
+
+    <!-- items menu  -->
+    <string name="settings">Настройки</string>
+    <string name="share">Поделиться</string>
+
+    <!-- weather  -->
+    <string name="clear">Clear</string>
+    <string name="cloudy">Cloudy</string>
+    <string name="rainy">Rainy</string>
+    <string name="foggy">Foggy</string>
+
 </resources>

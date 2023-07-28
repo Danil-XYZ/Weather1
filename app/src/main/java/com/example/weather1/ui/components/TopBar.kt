@@ -32,7 +32,8 @@ fun TopBarRow(
     onClicSecond: (() -> Unit)? = null
 ) {
     TopAppBar(
-        backgroundColor = Color.Transparent, contentColor = MaterialTheme.colors.onBackground,
+        backgroundColor = Color.Transparent,
+        contentColor = MaterialTheme.colors.onBackground,
         contentPadding = PaddingValues(horizontal = 16.dp),
         elevation = 0.dp
     ) {
