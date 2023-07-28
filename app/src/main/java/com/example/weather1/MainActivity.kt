@@ -16,6 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.findNavController
+import com.example.weather1.ui.NavigationHost
 import com.example.weather1.ui.components.DrawerPanel
 import com.example.weather1.ui.components.MenuItems
 import com.example.weather1.ui.components.TopBarRow
@@ -27,17 +30,26 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             val scope = rememberCoroutineScope()
             val scaffoldState = rememberScaffoldState()
+            val navController = rememberNavController()
+
             Weather1Theme {
 
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Image(
-                        painter = painterResource(id = R.drawable.img),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillHeight,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+                ) {
+
+                    if (navController.currentDestination?.route == "MainScreen") {
+                        Image(
+                            painter = painterResource(id = R.drawable.img),
+                            contentDescription = null,
+                            contentScale = ContentScale.FillHeight,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
 
                     Scaffold(
                         contentColor = MaterialTheme.colors.onBackground,
@@ -45,7 +57,9 @@ class MainActivity : ComponentActivity() {
                         backgroundColor = Color.Transparent,
                         topBar = {
                             TopBarRow(
-                                onClickFirst = { /*TODO*/ },
+                                onClickFirst = {
+                                    navController.navigate(route = "CityScreen")
+                                },
                                 onClicSecond = {
                                     scope.launch { scaffoldState.drawerState.open() }
                                 },
@@ -59,7 +73,8 @@ class MainActivity : ComponentActivity() {
                             ) { scope.launch { scaffoldState.drawerState.close() } }
                         }
                     ) {
-                        MainViewScreen()
+                        NavigationHost(navController = navController)
+                        //MainViewScreen()
                     }
                 }
             }
