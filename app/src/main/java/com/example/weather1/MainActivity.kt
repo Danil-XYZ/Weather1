@@ -4,18 +4,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.zIndex
 import com.example.weather1.ui.components.DrawerPanel
 import com.example.weather1.ui.components.MenuItems
 import com.example.weather1.ui.components.TopBarRow
@@ -44,22 +46,27 @@ class MainActivity : ComponentActivity() {
                         scaffoldState = scaffoldState,
                         backgroundColor = Color.Transparent,
                         topBar = {
+
                             TopBarRow(
                                 onClickFirst = { /*TODO*/ },
                                 onClicSecond = {
                                     scope.launch { scaffoldState.drawerState.open() }
                                 },
-                                title = "Moscow"
+                                title = "Moscow",
                             )
                         },
+
+
                         drawerContent = {
                             DrawerPanel(
                                 listOf(MenuItems.Settings, MenuItems.Share),
                                 MenuItems.Settings
                             ) { scope.launch { scaffoldState.drawerState.close() } }
                         }
+
+
                     ) {
-                        MainViewScreen()
+                        MainViewScreen(onClickMenu = {})
                     }
                 }
             }

@@ -15,31 +15,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.example.weather1.R
 import com.example.weather1.Weather
 import com.example.weather1.WeatherState
+import com.example.weather1.ui.components.MenuItems
 import java.time.LocalDate
 import java.time.Period
 
 @Composable
-@Preview
-fun MainViewScreen() {
+fun MainViewScreen(expanded: Boolean = true, onClickMenu: (MenuItems) -> Unit) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     Log.e("MainScreen", "$screenHeight $screenWidth")
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .padding(top = 16.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
+
 
         // Main container
         Column(
@@ -48,7 +43,51 @@ fun MainViewScreen() {
                 .fillMaxWidth()
         ) {
 
-            // Info conteiner
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+
+
+                Column(modifier = Modifier.zIndex(1f)) {
+                    if (expanded) {
+                        BoxWithConstraints(
+                            contentAlignment = Alignment.TopCenter,
+                            modifier = Modifier
+                                .height(0.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Surface(
+                                elevation = 8.dp,
+                                modifier = Modifier
+                                    .wrapContentSize(Alignment.BottomCenter, unbounded = true)
+                                    .width(maxWidth)
+                                    .zIndex(1f),
+                                shape = RoundedCornerShape(10.dp)
+                            ) {
+                                Column() {
+                                    listOf(MenuItems.Settings, MenuItems.Share).forEach() {
+                                        Row(modifier = Modifier
+                                            .height(44.dp)
+                                            .clickable { onClickMenu(it) }) {
+
+                                            Spacer(modifier = Modifier.width(16.dp))
+
+                                            Text(text = stringResource(id = it.title), color = Color.Black)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                // Info conteiner
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -87,7 +126,10 @@ fun MainViewScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF3BA4E8).copy(alpha = 0.5f), shape = RoundedCornerShape(30))
+                    .background(
+                        Color(0xFF3BA4E8).copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(30)
+                    )
                     .padding(16.dp)
 
             ) {
@@ -112,7 +154,10 @@ fun MainViewScreen() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF3BA4E8).copy(alpha = 0.5f), shape = RoundedCornerShape(10))
+                    .background(
+                        Color(0xFF3BA4E8).copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(10)
+                    )
             ) {
                 Row(modifier = Modifier.padding(16.dp)) {
                     Icon(
