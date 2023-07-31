@@ -37,7 +37,7 @@ fun TopBarRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         elevation = 0.dp
     ) {
-        Row(modifier = modifier.fillMaxWidth(),
+        Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
             ) {
 

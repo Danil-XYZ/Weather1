@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.weather1.R
 import com.example.weather1.Weather
 import com.example.weather1.WeatherState
@@ -26,8 +27,7 @@ import java.time.LocalDate
 import java.time.Period
 
 @Composable
-@Preview
-fun MainViewScreen() {
+fun MainViewScreen(navController: NavController) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -69,7 +69,7 @@ fun MainViewScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {  navController.navigate(route = "AirScreen") },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White.copy(alpha = 0.5f)),
                     shape = CircleShape,
                     elevation = ButtonDefaults.elevation(0.dp)

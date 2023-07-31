@@ -5,6 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.weather1.ui.airScreen.AirViewScreen
 import com.example.weather1.ui.cityScreen.CityViewScreen
 import com.example.weather1.ui.mainScreen.MainViewScreen
 
@@ -12,11 +13,15 @@ import com.example.weather1.ui.mainScreen.MainViewScreen
 fun NavigationHost(navController: NavController){
     NavHost(navController = navController as NavHostController, startDestination = "MainScreen"){
         composable("MainScreen"){
-            MainViewScreen()
+            MainViewScreen(navController)
         }
 
         composable("CityScreen"){
             CityViewScreen()
+        }
+
+        composable("AirScreen"){
+            AirViewScreen()
         }
     }
 }

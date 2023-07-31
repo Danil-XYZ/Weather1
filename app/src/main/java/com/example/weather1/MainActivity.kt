@@ -1,5 +1,6 @@
 package com.example.weather1
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
 
     val vm: RootViewModel by viewModels()
 
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -44,7 +46,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
 
-            LaunchedEffect(key1 = Unit){
+            LaunchedEffect(key1 = Unit) {
                 launch {
                     navController.currentBackStackEntryFlow.collectLatest {
                         //vm.updateRout(it.destination.route)
@@ -55,9 +57,10 @@ class MainActivity : ComponentActivity() {
 
             Weather1Theme {
 
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
                 ) {
 
                     if (state.currentRoute == "MainScreen") {
@@ -74,25 +77,41 @@ class MainActivity : ComponentActivity() {
                         scaffoldState = scaffoldState,
                         backgroundColor = Color.Transparent,
                         topBar = {
-                            TopBarRow(
-                                onClickFirst = {
-                                    navController.navigate(route = "CityScreen")
-                                },
-                                onClicSecond = {
-                                    scope.launch { scaffoldState.drawerState.open() }
-                                },
-                                title = "Moscow"
-                            )
+
+                            if (state.currentRoute == "MainScreen") {
+                                TopBarRow(
+                                    onClickFirst = {
+                                        navController.navigate(route = "CityScreen")
+                                    },
+                                    onClicSecond = {
+                                        scope.launch { scaffoldState.drawerState.open() }
+                                    },
+                                    title = "Moscow"
+                                )
+                            } else {
+                                TopBarRow(
+                                    onClickFirst = {
+                                        navController.navigate(route = "MainScreen")
+                                    },
+                                    iconPainterSecond = null,
+                                    title = null,
+                                    iconPainterFirst = painterResource(id = R.drawable.baseline_keyboard_backspace_24)
+                                )
+                            }
+
                         },
                         drawerContent = {
                             DrawerPanel(
                                 listOf(MenuItems.Settings, MenuItems.Share),
                                 MenuItems.Settings
-                            ) { scope.launch { scaffoldState.drawerState.close() } }
+                            ) {
+                                scope.launch {
+                                    scaffoldState.drawerState.close()
+                                }
+                            }
                         }
                     ) {
                         NavigationHost(navController = navController)
-                        //MainViewScreen()
                     }
                 }
             }
