@@ -28,9 +28,11 @@ import com.example.weather1.ui.components.MenuItems
 import com.example.weather1.ui.components.TopBarRow
 import com.example.weather1.ui.mainScreen.MainViewScreen
 import com.example.weather1.ui.theme.Weather1Theme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     val vm: RootViewModel by viewModels()
@@ -91,7 +93,7 @@ class MainActivity : ComponentActivity() {
                             } else {
                                 TopBarRow(
                                     onClickFirst = {
-                                        navController.navigate(route = "MainScreen")
+                                        navController.popBackStack()
                                     },
                                     iconPainterSecond = null,
                                     title = null,
