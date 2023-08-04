@@ -1,5 +1,6 @@
 package com.example.weather1.ui.cityScreen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -149,7 +150,11 @@ fun CityViewScreen(vm: CityViewModel = hiltViewModel()) {
         }
 
         Button(
-            onClick = { vm.process(CityEvents.SaveScreen) },
+            onClick = {
+                vm.process(CityEvents.SaveScreen)
+                Log.e("CityScreen", "Button clekced")
+
+            },
         ) {
             Text(text = "Save")
         }
