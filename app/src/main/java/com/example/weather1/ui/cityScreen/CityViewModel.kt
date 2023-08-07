@@ -21,16 +21,17 @@ class CityViewModel @Inject constructor(
     private val _state = MutableStateFlow(CityState())
 
     // Аналог геттера для _state?
-    val state = _state
+    val state = _state.asStateFlow()
+
 
     //
-    val currentState = _state.value
+    private val currentState: CityState
+        get() = state.value
 
     init {
         viewModelScope.launch {
             combineDataState().collectLatest { cityStateInfo ->
                 cityStateInfo?.let {
-                    Log.e("CityViewModel", "$it")
                     _state.value = currentState.copy(city = it.city, region = it.region)
                 }
             }
@@ -47,8 +48,6 @@ class CityViewModel @Inject constructor(
     }
 
     fun process(event: CityEvents) {
-        Log.e("CityViewModel", "$event")
-
         when (event) {
             is CityEvents.UpdateCity -> updateCity(event.city)
             is CityEvents.UpdateRegion -> updateRegion(event.region)
@@ -57,13 +56,13 @@ class CityViewModel @Inject constructor(
     }
 
     private fun updateCity(city: String) {
-        Log.e("CityViewModel", "updateCity $city")
+        Log.e("CityViewModel", "updateCity $city currentState $currentState")
         _state.value = currentState.copy(city = city)
     }
 
     private fun updateRegion(region: String) {
         val currentRegion = region.filter { it.isDigit() }.take(6).toIntOrNull() ?: 0
-        Log.e("CityViewModel", "updateRegion $currentRegion")
+        Log.e("CityViewModel", "updateRegion $currentRegion currentState $currentState")
         _state.value = currentState.copy(region = currentRegion)
     }
 

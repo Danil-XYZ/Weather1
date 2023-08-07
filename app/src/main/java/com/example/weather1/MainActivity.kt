@@ -83,6 +83,7 @@ class MainActivity : ComponentActivity() {
                             if (state.currentRoute == "MainScreen") {
                                 TopBarRow(
                                     onClickFirst = {
+                                        vm.updateIsBack(false)
                                         navController.navigate(route = "CityScreen")
                                     },
                                     onClicSecond = {
@@ -93,6 +94,7 @@ class MainActivity : ComponentActivity() {
                             } else {
                                 TopBarRow(
                                     onClickFirst = {
+                                        vm.updateIsBack(true)
                                         navController.popBackStack()
                                     },
                                     iconPainterSecond = null,
@@ -113,7 +115,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) {
-                        NavigationHost(navController = navController)
+                        NavigationHost(navController = navController, state.isBack)
                     }
                 }
             }

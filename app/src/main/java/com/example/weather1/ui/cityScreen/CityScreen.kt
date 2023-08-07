@@ -19,6 +19,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,10 +40,17 @@ import com.example.weather1.Weather
 import com.example.weather1.WeatherState
 
 @Composable
-fun CityViewScreen(vm: CityViewModel = hiltViewModel()) {
+fun CityViewScreen(vm: CityViewModel = hiltViewModel(), isBack:Boolean) {
 
     // Объект класса CityState
     val state: CityState by vm.state.collectAsState()
+
+    LaunchedEffect(key1 = Unit){
+        Log.e("CityViewScreen", "$isBack")
+        if (isBack){
+            vm.process(CityEvents.SaveScreen)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -149,15 +158,7 @@ fun CityViewScreen(vm: CityViewModel = hiltViewModel()) {
             }
         }
 
-        Button(
-            onClick = {
-                vm.process(CityEvents.SaveScreen)
-                Log.e("CityScreen", "Button clekced")
 
-            },
-        ) {
-            Text(text = "Save")
-        }
 
     }
 }
