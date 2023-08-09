@@ -1,19 +1,17 @@
 package com.example.weather1.di
 
-import android.provider.SyncStateContract
-import androidx.datastore.preferences.protobuf.Api
 import com.example.weather1.BuildConfig
-import com.squareup.moshi.Moshi
+import com.example.weather1.network.Api
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Named
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -33,7 +31,7 @@ object NetworkModule {
     fun api(@Named("httpClient") httpClient: OkHttpClient): Api {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().build()))
+            .addConverterFactory(MoshiConverterFactory.create(JsonParser.moshi))
             .client(httpClient)
             .build()
             .create(Api::class.java)

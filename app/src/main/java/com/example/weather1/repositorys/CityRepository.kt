@@ -1,6 +1,7 @@
 package com.example.weather1.repositorys
 
 import com.example.weather1.dataStore.AppDataStore
+import com.example.weather1.ui.cityScreen.CityStateInfo
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,15 +23,10 @@ import javax.inject.Singleton
 
 @Singleton
 class CityRepository @Inject constructor(private val dataStore: AppDataStore) {
-    fun getCityFlow(): Flow<String?> = dataStore.getCityFlow()
+    fun getCityFlow(): Flow<CityStateInfo?> = dataStore.getCityFlow()
 
-    suspend fun editCity(city: String) = dataStore.editCity(city)
+    suspend fun saveCity(city: CityStateInfo) = dataStore.saveCity(city)
 
     suspend fun removeCity() = dataStore.removeCity()
 
-    fun getRegionFlow(): Flow<Int?> = dataStore.getRegionFlow()
-
-    suspend fun editRegion(region: Int) = dataStore.editRegion(region)
-
-    suspend fun removeRegion() = dataStore.removeRegion()
 }

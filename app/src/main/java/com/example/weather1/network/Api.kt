@@ -13,7 +13,7 @@ interface Api {
         @Query("lon")lon:String,
         @Query("appid")appid:String = Constants.API_KEY,
         @Query("lang")lang:String = "ru",
+        @Query("units")units:String = "metric"
     ):Response<RespCurrentWeather>
-
 
 }

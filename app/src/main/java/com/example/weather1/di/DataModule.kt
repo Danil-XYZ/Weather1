@@ -8,6 +8,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.squareup.moshi.Json
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,4 +40,13 @@ object DataModule {
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
             produceFile = { appContext.preferencesDataStoreFile(WEATHER) })
     }
+
+    @Singleton
+    @Provides
+    fun provideMoshi(): Moshi = JsonParser.moshi
+
+}
+
+object JsonParser{
+    val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 }

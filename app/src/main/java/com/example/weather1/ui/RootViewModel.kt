@@ -18,10 +18,7 @@ class RootViewModel @Inject constructor(): ViewModel() {
         _state.value = currentState.copy(currentRoute = route)
     }
 
-    fun updateIsBack(isBack: Boolean){
-        _state.value = currentState.copy(isBack = isBack)
-    }
 
 }
 
-data class RootState(val currentRoute: String = "MainScreen", val isBack: Boolean = false)
+data class RootState(val currentRoute: String = "MainScreen")

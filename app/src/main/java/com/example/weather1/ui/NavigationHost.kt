@@ -10,14 +10,14 @@ import com.example.weather1.ui.cityScreen.CityViewScreen
 import com.example.weather1.ui.mainScreen.MainViewScreen
 
 @Composable
-fun NavigationHost(navController: NavController, isBack:Boolean){
+fun NavigationHost(navController: NavController){
     NavHost(navController = navController as NavHostController, startDestination = "MainScreen"){
         composable("MainScreen"){
             MainViewScreen(navController)
         }
 
         composable("CityScreen"){
-            CityViewScreen(isBack = isBack)
+            CityViewScreen()
         }
 
         composable("AirScreen"){

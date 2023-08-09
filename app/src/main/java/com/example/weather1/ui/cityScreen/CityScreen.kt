@@ -1,6 +1,8 @@
 package com.example.weather1.ui.cityScreen
 
-import android.util.Log
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -23,34 +24,50 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.example.weather1.R
 import com.example.weather1.Weather
 import com.example.weather1.WeatherState
 
 @Composable
-fun CityViewScreen(vm: CityViewModel = hiltViewModel(), isBack:Boolean) {
+fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel()) {
 
-    // Объект класса CityState
-    val state: CityState by vm.state.collectAsState()
+    // Состояние загружающееся из cityViewModel
+    val cityState: CityState by cityViewModel.readOnlyState.collectAsState()
+    //
+    val lifecycle: LifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(key1 = Unit){
-        Log.e("CityViewScreen", "$isBack")
-        if (isBack){
-            vm.process(CityEvents.SaveScreen)
+    // Сробатывает при выходе из композиции
+    DisposableEffect(Unit) {
+
+        val observer = LifecycleEventObserver { lifecycleOwner, event ->
+            when(event){
+                Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_DESTROY  -> {
+                    cityViewModel.process(CityEvents.SaveScreen)
+                }
+            }
+        }
+
+        lifecycle.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycle.lifecycle.removeObserver(observer)
         }
     }
+
+
 
     Column(
         modifier = Modifier
@@ -74,8 +91,9 @@ fun CityViewScreen(vm: CityViewModel = hiltViewModel(), isBack:Boolean) {
                 .fillMaxWidth()
                 .clip(CircleShape)
                 .background(Color.Gray),
-            value = state.city,
-            onValueChange = { city -> vm.process(CityEvents.UpdateCity(city)) },
+            value = cityState.city,
+            // При изменении вызывет CityEvents.UpdateCity(city)
+            onValueChange = { cityViewModel.process(CityEvents.UpdateCity(it)) },
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_search_24),
@@ -102,8 +120,9 @@ fun CityViewScreen(vm: CityViewModel = hiltViewModel(), isBack:Boolean) {
                 .clip(CircleShape)
                 .background(Color.Gray),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            value = state.region.toString(),
-            onValueChange = { region -> vm.process(CityEvents.UpdateRegion(region)) },
+            value = cityState.region.toString(),
+            // При изменении вызывет CityEvents.UpdateRegion(region)
+            onValueChange = { cityViewModel.process(CityEvents.UpdateRegion(it)) },
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_search_24),
