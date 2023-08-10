@@ -55,6 +55,9 @@ android {
 
 dependencies {
 
+    // system bars customization
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.28.0"
+
     //retrofit2
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.0"))

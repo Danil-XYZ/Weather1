@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.findNavController
 import com.example.weather1.ui.NavigationHost
@@ -28,6 +29,7 @@ import com.example.weather1.ui.components.MenuItems
 import com.example.weather1.ui.components.TopBarRow
 import com.example.weather1.ui.mainScreen.MainViewScreen
 import com.example.weather1.ui.theme.Weather1Theme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -39,6 +41,9 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         super.onCreate(savedInstanceState)
         setContent {
 
@@ -47,6 +52,10 @@ class MainActivity : ComponentActivity() {
             val scaffoldState = rememberScaffoldState()
             val navController = rememberNavController()
 
+            val systemUiController = rememberSystemUiController()
+            SideEffect {
+                systemUiController.setStatusBarColor(color = Color.Transparent)
+            }
 
             LaunchedEffect(key1 = Unit) {
                 launch {
