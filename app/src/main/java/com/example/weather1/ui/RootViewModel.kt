@@ -1,24 +1,40 @@
 package com.example.weather1.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.weather1.repositorys.CityRepository
+import com.example.weather1.repositorys.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
-class RootViewModel @Inject constructor(): ViewModel() {
-    private val _state = MutableStateFlow(RootState())
-    val state = _state.asStateFlow()
+class RootViewModel @Inject constructor(
+    private val mainRespository: MainRepository,
+    private val cityRepository: CityRepository
+) : ViewModel() {
+    private val stateFlow = MutableStateFlow(RootState())
+    val readOnlystate = stateFlow.asStateFlow()
     private val currentState
-        get() = _state.value
+        get() = stateFlow.value
 
-    fun updateRout(route:String){
-        _state.value = currentState.copy(currentRoute = route)
+    init {
+        viewModelScope.launch {
+            cityRepository.getCityFlow().collectLatest {
+                stateFlow.value = currentState.copy(currentCity = it?.city ?: "Error")
+            }
+        }
+    }
+
+    fun updateRout(route: String) {
+        stateFlow.value = currentState.copy(currentRoute = route)
     }
 
 
 }
 
-data class RootState(val currentRoute: String = "MainScreen")
+data class RootState(val currentRoute: String = "MainScreen", val currentCity: String = "Error")

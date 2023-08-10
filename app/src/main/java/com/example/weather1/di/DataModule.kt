@@ -8,6 +8,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.example.weather1.db.AppDb
+import com.example.weather1.db.dao.ShortWeatherDao
+import com.example.weather1.db.dao.WeatherDao
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -44,6 +47,15 @@ object DataModule {
     @Singleton
     @Provides
     fun provideMoshi(): Moshi = JsonParser.moshi
+
+    @Provides
+    @Singleton
+    fun weatherDao(db: AppDb): WeatherDao = db.weatherDao()
+
+    @Provides
+    @Singleton
+    fun shortWeatherDao(db: AppDb): ShortWeatherDao = db.shortWeatherDao()
+
 
 }
 

@@ -10,13 +10,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 
 class MainViewModel @Inject constructor(
-    mainRepository: MainRepository,
+    private val mainRepository: MainRepository,
     private val locationProvider: LocationProvider
 ) : ViewModel() {
 
@@ -32,18 +33,21 @@ class MainViewModel @Inject constructor(
     init {
         // Создаётся новая нить
         viewModelScope.launch {
-            val currentWeather = mainRepository.loadWeather("53.03000", "49.3461000")
-            mutableState.value = currentState.copy(screen = CheckMainScreen.MainView(currentWeather))
+            mainRepository.getCityLocationFlow().collectLatest {
+                val currentWeather = mainRepository.loadWeather(it?.lat.toString(), it?.lat.toString())
+                mutableState.value = currentState.copy(screen = CheckMainScreen.MainView(currentWeather))
+            }
         }
     }
 
     private fun updateLocation() {
         Log.e("MainViewModel", "location updated ${locationProvider.currentLocation()}")
-
-        locationProvider.start()
-        locationProvider.currentLocation()?.let {
-            Log.e("MainViewModel", "location: $it")
-            mutableState.value = currentState.copy(lat = it.first, lon = it.second)
+        viewModelScope.launch {
+            locationProvider.start()
+            locationProvider.currentLocation()?.let {
+                Log.e("MainViewModel", "location: $it")
+                mainRepository.saveCityLocation(CityLocation(it.first, it.second))
+            }
         }
     }
 
@@ -55,10 +59,9 @@ class MainViewModel @Inject constructor(
 
 }
 
+data class CityLocation(val lat: Double =  37.6156, val lon: Double = 55.7522 )
 
 data class MainState(
-    val lat: Double = 0.0,
-    val lon: Double = 0.0,
     val screen: CheckMainScreen = CheckMainScreen.Lodaing
 )
 

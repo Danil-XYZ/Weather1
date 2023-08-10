@@ -16,4 +16,11 @@ interface Api {
         @Query("units")units:String = "metric"
     ):Response<RespCurrentWeather>
 
+    @POST("/data/2.5/weather")
+    suspend fun currentWeatherByCity(
+        @Query("q")city:String,
+        @Query("appid")appid:String = Constants.API_KEY,
+        @Query("lang")lang:String = "ru",
+        @Query("units")units:String = "metric"
+    ):Response<RespCurrentWeather>
 }
