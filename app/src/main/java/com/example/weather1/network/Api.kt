@@ -9,8 +9,7 @@ import retrofit2.Response
 interface Api {
     @POST("/data/2.5/weather")
     suspend fun currentWeather(
-        @Query("lat")lat:String,
-        @Query("lon")lon:String,
+        @Query("q")city:String,
         @Query("appid")appid:String = Constants.API_KEY,
         @Query("lang")lang:String = "ru",
         @Query("units")units:String = "metric"

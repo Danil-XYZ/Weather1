@@ -1,7 +1,6 @@
 package com.example.weather1.ui.mainScreen
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -37,17 +36,18 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
 
     val mainState: MainState by mainViewModel.readOnlyState.collectAsState()
 
-
+    // Ширина экрана
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    Log.e("MainScreen", "$screenHeight $screenWidth")
 
+    // Если есть все разершения вызвать событие UpdateLocation
     val permissionRequest =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            permissions -> if(permissions.values.all { it }) mainViewModel.process(MainEvents.UpdateLocation)
+            permissions -> if(permissions.values.all { it }) mainViewModel.process(MainScreenEvents.UpdateLocation)
         }
 
+    // При запуске MainScreen
     LaunchedEffect(Unit) {
+        // Запрос разрешений
         permissionRequest.launch(
             arrayOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -64,13 +64,13 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
             .verticalScroll(rememberScrollState())
     ) {
 
-        when(val screen = mainState.screen){
-            is CheckMainScreen.Lodaing -> {
+        when(val screen = mainState.screenStatus){
+            is MainScreenStatus.MainScreenLodaing -> {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
                     CircularProgressIndicator(color = Color.White)
                 }
             }
-            is CheckMainScreen.MainView -> {
+            is MainScreenStatus.MainScreenActive -> {
                 // Main container
                 Column(
                     modifier = Modifier

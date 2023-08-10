@@ -7,7 +7,6 @@ import com.example.weather1.network.RespCurrentWeather
 import com.example.weather1.repositorys.MainRepository
 import com.example.weather1.ui.base.LocationProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -35,7 +34,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             mainRepository.getCityLocationFlow().collectLatest {
                 val currentWeather = mainRepository.loadWeather(it?.lat.toString(), it?.lat.toString())
-                mutableState.value = currentState.copy(screen = CheckMainScreen.MainView(currentWeather))
+                mutableState.value = currentState.copy(screenStatus = MainScreenStatus.MainScreenActive(currentWeather))
             }
         }
     }
@@ -51,9 +50,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun process(event: MainEvents) {
+    fun process(event: MainScreenEvents) {
         when(event){
-            is MainEvents.UpdateLocation -> updateLocation()
+            is MainScreenEvents.UpdateLocation -> updateLocation()
         }
     }
 
@@ -62,14 +61,14 @@ class MainViewModel @Inject constructor(
 data class CityLocation(val lat: Double =  37.6156, val lon: Double = 55.7522 )
 
 data class MainState(
-    val screen: CheckMainScreen = CheckMainScreen.Lodaing
+    val screenStatus: MainScreenStatus = MainScreenStatus.MainScreenLodaing
 )
 
-sealed class MainEvents {
-    object UpdateLocation: MainEvents()
+sealed class MainScreenEvents {
+    object UpdateLocation: MainScreenEvents()
 }
 
-sealed class CheckMainScreen {
-    object Lodaing: CheckMainScreen()
-    data class MainView(val currentWeather: RespCurrentWeather): CheckMainScreen()
+sealed class MainScreenStatus {
+    object MainScreenLodaing: MainScreenStatus()
+    data class MainScreenActive(val currentWeather: RespCurrentWeather): MainScreenStatus()
 }
