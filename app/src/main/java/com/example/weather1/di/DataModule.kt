@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.room.Room
 import com.example.weather1.db.AppDb
 import com.example.weather1.db.dao.ShortWeatherDao
 import com.example.weather1.db.dao.WeatherDao
@@ -44,9 +45,18 @@ object DataModule {
             produceFile = { appContext.preferencesDataStoreFile(WEATHER) })
     }
 
+
     @Singleton
     @Provides
     fun provideMoshi(): Moshi = JsonParser.moshi
+
+    @Provides
+    @Singleton
+    fun appDb(@ApplicationContext context: Context): AppDb = Room.databaseBuilder(
+        context,
+        AppDb::class.java,
+        AppDb.DATABASE_NAME
+    ).fallbackToDestructiveMigrationOnDowngrade().build()
 
     @Provides
     @Singleton

@@ -3,6 +3,7 @@ package com.example.weather1.ui.mainScreen
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weather1.db.entity.FullWeather
 import com.example.weather1.network.RespCurrentWeather
 import com.example.weather1.repositorys.MainRepository
 import com.example.weather1.ui.base.LocationProvider
@@ -71,5 +72,5 @@ sealed class MainEvents {
 
 sealed class CheckMainScreen {
     object Lodaing: CheckMainScreen()
-    data class MainView(val currentWeather: RespCurrentWeather): CheckMainScreen()
+    data class MainView(val currentWeather: FullWeather): CheckMainScreen()
 }

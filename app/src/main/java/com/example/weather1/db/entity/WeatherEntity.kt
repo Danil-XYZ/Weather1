@@ -17,12 +17,7 @@ data class WeatherEntity(
     val id: Long = 0,
     @Embedded
     var coord: Coord? = Coord(),
-    @Relation(
-        entity = ShortWeatherEntity::class,
-        parentColumn = "id",
-        entityColumn = "weatherId"
-    )
-    val weather: List<Weather> = listOf(),
+
     val base: String? = null,
     @Embedded
     val main: Main? = Main(),
@@ -35,6 +30,16 @@ data class WeatherEntity(
     @Embedded
     val sys: Sys? = Sys(),
     val timezone: Int? = null,
-    val name: String? = null,
+    val name: String? = "Москва",
     val cod: Int? = null
+)
+
+data class FullWeather(
+    @Embedded
+    val weatherEntity: WeatherEntity = WeatherEntity(),
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "weatherId"
+    )
+    val shortWeatherEntity: List<ShortWeatherEntity> = listOf(),
 )

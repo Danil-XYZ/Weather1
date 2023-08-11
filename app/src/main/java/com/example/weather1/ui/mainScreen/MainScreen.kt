@@ -87,12 +87,12 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = screen.currentWeather.main?.temp?.roundToInt().toString(),
+                            text = screen.currentWeather.weatherEntity.main?.temp?.roundToInt().toString(),
                             fontSize = 96.sp
                         )
 
                         Text(
-                            text = "${screen.currentWeather.weather.firstOrNull()?.description} 29/16",
+                            text = "${screen.currentWeather.shortWeatherEntity.firstOrNull()?.description} 29/16",
                             fontSize = 24.sp
                         )
 

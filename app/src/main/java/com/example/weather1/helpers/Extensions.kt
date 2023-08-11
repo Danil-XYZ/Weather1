@@ -9,7 +9,6 @@ fun RespCurrentWeather.toWeatherEntity(): WeatherEntity {
     return WeatherEntity(
         id = id?.toLong() ?: 0,
         coord = coord,
-        weather = weather,
         base = base,
         main = main,
         visibility = visibility,

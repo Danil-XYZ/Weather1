@@ -5,6 +5,8 @@ import android.util.Log
 import com.example.weather1.dataStore.AppDataStore
 import com.example.weather1.db.dao.ShortWeatherDao
 import com.example.weather1.db.dao.WeatherDao
+import com.example.weather1.db.entity.FullWeather
+import com.example.weather1.helpers.Utils
 import com.example.weather1.helpers.toShortWeatherEntity
 import com.example.weather1.helpers.toWeatherEntity
 import com.example.weather1.network.Api
@@ -24,24 +26,33 @@ class MainRepository @Inject constructor(
     private val shortWeatherDao: ShortWeatherDao
 ) {
     //
-    suspend fun loadWeather(lat: String, lon: String): RespCurrentWeather {
+    suspend fun loadWeather(lat: String, lon: String): FullWeather {
 
-        if (lat == "null" || lon == "null") return RespCurrentWeather(name = "Москва")
-        val response = api.currentWeather(lat, lon).body() ?: RespCurrentWeather()
-        Log.e("MainRepository", "${response}")
-        val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CityStateInfo("Москва", 77)
+        if (!Utils.noInternetConnection()) {
+            if (lat == "null" || lon == "null") {
 
-        val weather = response.toWeatherEntity()
-        weatherDao.insertAll(weather)
-        val shortWeathers = response.weather.map{
-            it.toShortWeatherEntity(weatherId = response.id!!.toLong())
+                return weatherDao.getFull().firstOrNull() ?: FullWeather()
+            }
+            val response = api.currentWeather(lat, lon).body() ?: RespCurrentWeather()
+            Log.e("MainRepository", "${response}")
+            val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CityStateInfo("Москва", 77)
+
+            val weather = response.toWeatherEntity()
+            weatherDao.insertAll(weather)
+            val shortWeathers = response.weather.map{
+                it.toShortWeatherEntity(weatherId = response.id!!.toLong())
+            }
+            shortWeatherDao.insertAll(shortWeathers)
+
+            dataStore.saveCity(cityStateInfo.copy(city = response.name ?: "Москва"))
+
+            return weatherDao.getFull().firstOrNull() ?: FullWeather()
         }
-        shortWeatherDao.insertAll(shortWeathers)
+        else {
+            return weatherDao.getFull().firstOrNull() ?: FullWeather()
 
+        }
 
-        dataStore.saveCity(cityStateInfo.copy(city = response.name ?: "Москва"))
-        // Возвращает тело ответа
-        return response
     }
 
     fun getCityLocationFlow(): Flow<CityLocation?> {

@@ -1,19 +1,22 @@
 package com.example.weather1.db.dao
 
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.weather1.db.entity.ShortWeatherEntity
 import com.example.weather1.db.entity.WeatherEntity
 import com.example.weather1.network.Weather
 
+@Dao
 interface ShortWeatherDao {
-    @Insert
-    fun insertAll(weather: List<ShortWeatherEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(weather: List<ShortWeatherEntity>)
 
     @Delete
-    fun delete(weather: ShortWeatherEntity)
+    suspend fun delete(weather: ShortWeatherEntity)
 
     @Query("SELECT * FROM shortWeather")
-    fun getAll(): List<ShortWeatherEntity>
+    suspend fun getAll(): List<ShortWeatherEntity>
 }

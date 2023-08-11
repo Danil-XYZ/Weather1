@@ -29,17 +29,17 @@ data class Weather(
 
     var id: Int? = null,
     var main: String? = null,
-    var description: String? = null,
+    var description: String? = "Ясно",
     var icon: String? = null
 
 )
 
 data class Main(
 
-    var temp: Double? = null,
+    var temp: Double? = 20.0,
     @Json(name = "feels_like")var feelsLike: Double? = null,
-    @Json(name = "temp_min")var tempMin: Double? = null,
-    @Json(name = "temp_max")var tempMax: Double? = null,
+    @Json(name = "temp_min")var tempMin: Double? = 20.0,
+    @Json(name = "temp_max")var tempMax: Double? = 20.0,
     var pressure: Int? = null,
     var humidity: Int? = null,
     @Json(name = "sea_level")var seaLevel: Int? = null,
