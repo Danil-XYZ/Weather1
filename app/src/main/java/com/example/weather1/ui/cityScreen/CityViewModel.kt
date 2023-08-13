@@ -3,7 +3,6 @@ package com.example.weather1.ui.cityScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weather1.repositorys.CityRepository
-import com.example.weather1.ui.base.LocationProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.*
@@ -16,15 +15,15 @@ class CityViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Создаёт изменяемый поток состояния с заданным начальным значением (CityState("", 0))
-    private val mutableState = MutableStateFlow(CityState())
+    private val stateFlow = MutableStateFlow(CityState())
 
     // Аналог геттера для _state?
-    val readOnlyState = mutableState.asStateFlow()
+    val readOnlyStateFlaw = stateFlow.asStateFlow()
 
 
     // Текущее состояние данных
     private val currentState: CityState
-        get() = readOnlyState.value
+        get() = readOnlyStateFlaw.value
 
     // Выполняется сри создании CityViewModel
     init {
@@ -34,7 +33,7 @@ class CityViewModel @Inject constructor(
             repository.getCityFlow().collectLatest { collectedLatest ->
                 collectedLatest?.let {
                     //Присваеваем мотоку состояния полученные данные
-                    mutableState.value = currentState.copy(city = it.city, region = it.region)
+                    stateFlow.value = currentState.copy(city = it.city, region = it.region)
                 }
             }
         }
@@ -51,14 +50,14 @@ class CityViewModel @Inject constructor(
 
     // Присваевает изменяемому потоку значение city из памяти
     private fun updateCity(city: String) {
-        mutableState.value = currentState.copy(city = city)
+        stateFlow.value = currentState.copy(city = city)
     }
 
     // Присваевает изменяемому потоку значение region из памяти
     private fun updateRegion(region: String) {
         // Принимает только первые 6 чисел
         val currentRegion = region.filter { it.isDigit() }.take(6).toIntOrNull() ?: 0
-        mutableState.value = currentState.copy(region = currentRegion)
+        stateFlow.value = currentState.copy(region = currentRegion)
     }
 
     // Сохраняет в память текущие значения

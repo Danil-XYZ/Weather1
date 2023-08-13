@@ -4,11 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weather1.db.entity.FullWeather
-import com.example.weather1.network.RespCurrentWeather
 import com.example.weather1.repositorys.MainRepository
 import com.example.weather1.ui.base.LocationProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -23,12 +21,12 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Создаётся изменяемый поток состояний
-    private val mutableState = MutableStateFlow(MainState())
+    private val stateFlaw = MutableStateFlow(MainState())
 
-    val readOnlyState = mutableState.asStateFlow()
+    val readOnlyStateFlaw = stateFlaw.asStateFlow()
 
     private val currentState: MainState
-        get() = readOnlyState.value
+        get() = readOnlyStateFlaw.value
 
     // Выполняется сри создании CityViewModel
     init {
@@ -36,7 +34,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             mainRepository.getCityLocationFlow().collectLatest {
                 val currentWeather = mainRepository.loadWeather(it?.lat.toString(), it?.lat.toString())
-                mutableState.value = currentState.copy(screen = CheckMainScreen.MainView(currentWeather))
+                stateFlaw.value = currentState.copy(screen = CheckMainScreen.MainView(currentWeather))
             }
         }
     }

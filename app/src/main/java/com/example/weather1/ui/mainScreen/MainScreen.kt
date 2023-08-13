@@ -35,7 +35,7 @@ import kotlin.math.roundToInt
 fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = hiltViewModel()) {
 
 
-    val mainState: MainState by mainViewModel.readOnlyState.collectAsState()
+    val mainState: MainState by mainViewModel.readOnlyStateFlaw.collectAsState()
 
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp

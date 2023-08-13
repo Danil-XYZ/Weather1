@@ -2,6 +2,7 @@ package com.example.weather1
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -41,30 +42,40 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        // Элементы декора окна могут занимать пространство StatusBar
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         super.onCreate(savedInstanceState)
         setContent {
 
             val systemUiController = rememberSystemUiController()
+
             SideEffect {
+                // Меняет цвет state bar на прозрачный
                 systemUiController.setStatusBarColor(color = Color.Transparent)
             }
 
-            val rootState: RootState by rootViewModel.readOnlystate.collectAsState()
+            // объект класса RootState
+            val rootState by rootViewModel.readOnlystate.collectAsState()
+            //основной поток
             val scope = rememberCoroutineScope()
+
             val scaffoldState = rememberScaffoldState()
             val navController = rememberNavController()
 
-
+            // Получает последние данные из потока
             LaunchedEffect(key1 = Unit) {
                 launch {
+                    // По неизвестной причине тело этого метода выполняется каждый раз при смене экрана
                     navController.currentBackStackEntryFlow.collectLatest {
-                        //vm.updateRout(it.destination.route)
-                        it.destination.route?.let { it1 -> rootViewModel.updateRout(it1) }
+                        // Обновляет rout в RootViewModel
+                        it.destination.route?.let {
+                            rootViewModel.updateRout(it)
+                        }
                     }
                 }
             }
+
 
             Weather1Theme {
 

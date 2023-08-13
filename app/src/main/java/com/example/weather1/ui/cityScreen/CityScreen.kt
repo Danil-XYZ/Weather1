@@ -1,8 +1,5 @@
 package com.example.weather1.ui.cityScreen
 
-import android.Manifest
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +18,6 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,7 +42,7 @@ import com.example.weather1.WeatherState
 fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel()) {
 
     // Состояние загружающееся из cityViewModel
-    val cityState: CityState by cityViewModel.readOnlyState.collectAsState()
+    val cityState: CityState by cityViewModel.readOnlyStateFlaw.collectAsState()
     //
     val lifecycle: LifecycleOwner = LocalLifecycleOwner.current
 

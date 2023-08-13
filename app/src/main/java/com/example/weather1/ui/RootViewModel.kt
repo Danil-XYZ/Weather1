@@ -1,5 +1,6 @@
 package com.example.weather1.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weather1.repositorys.CityRepository
@@ -17,13 +18,17 @@ class RootViewModel @Inject constructor(
     private val mainRespository: MainRepository,
     private val cityRepository: CityRepository
 ) : ViewModel() {
+    // Изменяемый поток состояний хранит RootState
     private val stateFlow = MutableStateFlow(RootState())
+
     val readOnlystate = stateFlow.asStateFlow()
+
     private val currentState
         get() = stateFlow.value
 
     init {
         viewModelScope.launch {
+            // При загрузке приложения извлекает из памяти название города
             cityRepository.getCityFlow().collectLatest {
                 stateFlow.value = currentState.copy(currentCity = it?.city ?: "Error")
             }
@@ -32,9 +37,11 @@ class RootViewModel @Inject constructor(
 
     fun updateRout(route: String) {
         stateFlow.value = currentState.copy(currentRoute = route)
+        Log.e("MainActivity", "RootUpdated ${stateFlow.value}")
+
     }
 
 
 }
 
-data class RootState(val currentRoute: String = "MainScreen", val currentCity: String = "Error")
+data class RootState(val currentRoute: String = "MainScreen", val currentCity: String = "")
