@@ -23,20 +23,20 @@ class RootViewModel @Inject constructor(
 
     val readOnlystate = stateFlow.asStateFlow()
 
-    private val currentState
+    private val currentStateFlow
         get() = stateFlow.value
 
     init {
         viewModelScope.launch {
             // При загрузке приложения извлекает из памяти название города
             cityRepository.getCityFlow().collectLatest {
-                stateFlow.value = currentState.copy(currentCity = it?.city ?: "Error")
+                stateFlow.value = currentStateFlow.copy(currentCity = it?.city ?: "Error")
             }
         }
     }
 
     fun updateRout(route: String) {
-        stateFlow.value = currentState.copy(currentRoute = route)
+        stateFlow.value = currentStateFlow.copy(currentRoute = route)
         Log.e("MainActivity", "RootUpdated ${stateFlow.value}")
 
     }

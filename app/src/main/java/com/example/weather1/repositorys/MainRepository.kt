@@ -11,8 +11,8 @@ import com.example.weather1.helpers.toShortWeatherEntity
 import com.example.weather1.helpers.toWeatherEntity
 import com.example.weather1.network.Api
 import com.example.weather1.network.RespCurrentWeather
-import com.example.weather1.ui.cityScreen.CityStateInfo
-import com.example.weather1.ui.mainScreen.CityLocation
+import com.example.weather1.ui.cityScreen.CurrentCityInfo
+import com.example.weather1.ui.mainScreen.CityCoordinates
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -35,7 +35,7 @@ class MainRepository @Inject constructor(
             }
             val response = api.currentWeather(lat, lon).body() ?: RespCurrentWeather()
             Log.e("MainRepository", "${response}")
-            val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CityStateInfo("Москва", 77)
+            val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CurrentCityInfo("Москва")
 
             val weather = response.toWeatherEntity()
             weatherDao.insertAll(weather)
@@ -55,11 +55,11 @@ class MainRepository @Inject constructor(
 
     }
 
-    fun getCityLocationFlow(): Flow<CityLocation?> {
+    fun getCityLocationFlow(): Flow<CityCoordinates?> {
         return dataStore.getCityLocationFlow()
     }
 
-    suspend fun saveCityLocation(location: CityLocation?) {
+    suspend fun saveCityLocation(location: CityCoordinates?) {
         dataStore.saveCityLocation(location)
     }
 }

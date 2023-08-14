@@ -4,8 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.weather1.ui.cityScreen.CityStateInfo
-import com.example.weather1.ui.mainScreen.CityLocation
+import com.example.weather1.ui.cityScreen.CurrentCityInfo
+import com.example.weather1.ui.mainScreen.CityCoordinates
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import kotlinx.coroutines.flow.Flow
@@ -48,25 +48,20 @@ class AppDataStore @Inject constructor(private val dataStore: DataStore<Preferen
 
 
 
-    fun getCityFlow(): Flow<CityStateInfo?> {
+    fun getCityFlow(): Flow<CurrentCityInfo?> {
         return dataStore.data.map{pref -> moshi.parseObj(pref[PreferencesKeys.CITY_INFO])}
     }
 
-    suspend fun saveCity(city: CityStateInfo?) {
+    suspend fun saveCity(city: CurrentCityInfo?) {
         dataStore.edit{pref -> pref[PreferencesKeys.CITY_INFO] = moshi.toJson(city)}
     }
 
-    suspend fun removeCity() {
-        dataStore.edit {pref -> pref.remove(PreferencesKeys.CITY_INFO)}
-    }
 
-
-
-    fun getCityLocationFlow(): Flow<CityLocation?> {
+    fun getCityLocationFlow(): Flow<CityCoordinates?> {
         return dataStore.data.map{pref -> moshi.parseObj(pref[PreferencesKeys.CITY_LOCATION])}
     }
 
-    suspend fun saveCityLocation(location: CityLocation?) {
+    suspend fun saveCityLocation(location: CityCoordinates?) {
         dataStore.edit{pref -> pref[PreferencesKeys.CITY_LOCATION] = moshi.toJson(location)}
     }
 

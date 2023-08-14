@@ -1,7 +1,6 @@
 package com.example.weather1.ui.mainScreen
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -34,20 +33,20 @@ import kotlin.math.roundToInt
 @Composable
 fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = hiltViewModel()) {
 
-
+    // Объект MainState добавленный для работы с MainViewModel
     val mainState: MainState by mainViewModel.readOnlyStateFlaw.collectAsState()
 
-
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    Log.e("MainScreen", "$screenHeight $screenWidth")
 
+    // Формирование запроса разрешений
     val permissionRequest =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            permissions -> if(permissions.values.all { it }) mainViewModel.process(MainEvents.UpdateLocation)
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            // Если получены все разрешения обнавляется геолокация
+            if (permissions.values.all { it }) mainViewModel.process(MainEvents.UpdateLocation)
         }
 
     LaunchedEffect(Unit) {
+        // Запуск запроса разрешений при загрузке MainScreen
         permissionRequest.launch(
             arrayOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -64,66 +63,129 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
             .verticalScroll(rememberScrollState())
     ) {
 
-        when(val screen = mainState.screen){
-            is CheckMainScreen.Lodaing -> {
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
-                    CircularProgressIndicator(color = Color.White)
-                }
-            }
-            is CheckMainScreen.MainView -> {
-                // Main container
-                Column(
-                    modifier = Modifier
-                        .height(screenHeight - 80.dp)
-                        .fillMaxWidth()
-                ) {
 
-                    // Info conteiner
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+        // Main container
+        Column(
+            modifier = Modifier
+                .height(screenHeight - 80.dp)
+                .fillMaxWidth()
+        ) {
+
+            // Info conteiner
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                when (val screenStatus = mainState.screenStatus) {
+                    is MainScreenStatus.IsLodaing -> {
+                        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = Color.White)
+                        }
+                    }
+
+                    is MainScreenStatus.IsLoadedWithWeather -> {
+
                         Text(
-                            text = screen.currentWeather.weatherEntity.main?.temp?.roundToInt().toString(),
+                            text = screenStatus.currentWeather.weatherEntity.main?.temp?.roundToInt()
+                                .toString(),
                             fontSize = 96.sp
                         )
 
                         Text(
-                            text = "${screen.currentWeather.shortWeatherEntity.firstOrNull()?.description} 29/16",
+                            text = "${
+                                screenStatus.currentWeather.shortWeatherEntity.firstOrNull()
+                                ?.description?.split(" ")?.firstOrNull()
+                            } 29/16",
                             fontSize = 24.sp
                         )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Button(
-                            onClick = {  navController.navigate(route = "AirScreen") },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White.copy(alpha = 0.5f)),
-                            shape = CircleShape,
-                            elevation = ButtonDefaults.elevation(0.dp)
-                        ) {
-                            Text(
-                                text = "AQL 27",
-                                textAlign = TextAlign.Center,
-                                fontSize = 16.sp
-                            )
-                        }
                     }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { navController.navigate(route = "AirScreen") },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White.copy(alpha = 0.5f)),
+                    shape = CircleShape,
+                    elevation = ButtonDefaults.elevation(0.dp)
+                ) {
+                    Text(
+                        text = "AQL 27",
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp
+                    )
+                }
+            }
 
 
-                    // Warning
-                    Row(
+            // Warning
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Color(0xFF3BA4E8).copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(30)
+                    )
+                    .padding(16.dp)
+
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Transparent,
+                            shape = RoundedCornerShape(100)
+                        )
+                        .clickable { },
+                    painter = painterResource(id = R.drawable.ic_baseline_warning_24),
+                    contentDescription = null,
+                    tint = Color.White,
+                )
+
+                Text(text = "Yellow Warning for High!!!!")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Forecast
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Color(0xFF3BA4E8).copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(10)
+                    )
+            ) {
+                Row(modifier = Modifier.padding(16.dp)) {
+                    Icon(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .background(
-                                Color(0xFF3BA4E8).copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(30)
+                                color = Color.Transparent,
+                                shape = RoundedCornerShape(100)
                             )
-                            .padding(16.dp)
+                            .clickable { },
+                        painter = painterResource(id = R.drawable.ic_baseline_warning_24),
+                        contentDescription = null,
+                        tint = Color.White,
+                    )
 
-                    ) {
+                    Text(text = "Yellow Warning for High!!!!")
+                }
+
+
+                val weatherList = listOf(
+                    Weather(WeatherState.Clear, 20, 30),
+                    Weather(WeatherState.Clear, 22, 33),
+                    Weather(WeatherState.Clear, 21, 31)
+                )
+
+                var date = LocalDate.now()
+
+                weatherList.forEach {
+                    Row(modifier = Modifier.padding(16.dp)) {
                         Icon(
                             modifier = Modifier
                                 .background(
@@ -135,79 +197,23 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
                             contentDescription = null,
                             tint = Color.White,
                         )
-
-                        Text(text = "Yellow Warning for High!!!!")
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Forecast
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Color(0xFF3BA4E8).copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(10)
-                            )
-                    ) {
-                        Row(modifier = Modifier.padding(16.dp)) {
-                            Icon(
-                                modifier = Modifier
-                                    .background(
-                                        color = Color.Transparent,
-                                        shape = RoundedCornerShape(100)
-                                    )
-                                    .clickable { },
-                                painter = painterResource(id = R.drawable.ic_baseline_warning_24),
-                                contentDescription = null,
-                                tint = Color.White,
-                            )
-
-                            Text(text = "Yellow Warning for High!!!!")
-                        }
-
-
-                        val weatherList = listOf(
-                            Weather(WeatherState.Clear, 20, 30),
-                            Weather(WeatherState.Clear, 22, 33),
-                            Weather(WeatherState.Clear, 21, 31)
+                        Text(text = date.dayOfWeek.toString())
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.End,
+                            text = "${it.dayTemperature}/${it.nightTemperature}"
                         )
-
-                        var date = LocalDate.now()
-
-                        weatherList.forEach {
-                            Row(modifier = Modifier.padding(16.dp)) {
-                                Icon(
-                                    modifier = Modifier
-                                        .background(
-                                            color = Color.Transparent,
-                                            shape = RoundedCornerShape(100)
-                                        )
-                                        .clickable { },
-                                    painter = painterResource(id = R.drawable.ic_baseline_warning_24),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                )
-                                Text(text = date.dayOfWeek.toString())
-                                Text(
-                                    modifier = Modifier.weight(1f),
-                                    textAlign = TextAlign.End,
-                                    text = "${it.dayTemperature}/${it.nightTemperature}"
-                                )
-                                var period = Period.of(0, 0, 1)
-                                date = date.plus(period)
-                            }
-                        }
-
-
+                        var period = Period.of(0, 0, 1)
+                        date = date.plus(period)
                     }
                 }
+
+
             }
         }
-
-
     }
 }
+
 
 @Composable
 fun Forecast(weather: String = "Unknown") {
