@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 @HiltViewModel
 class CityViewModel @Inject constructor(
@@ -34,7 +33,8 @@ class CityViewModel @Inject constructor(
             repository.getCityFlow().collectLatest { collectedLatest ->
                 collectedLatest?.let {
                     //Присваеваем потоку состояния полученные данные
-                    stateFlow.value = currentStateFlow.copy(cityName = it.city, cityList = it.cityList)
+                    stateFlow.value =
+                        currentStateFlow.copy(cityName = it.city, cityList = it.cityList)
                 }
             }
         }
@@ -42,6 +42,7 @@ class CityViewModel @Inject constructor(
 
     // Присваевает изменяемому потоку значение city из памяти
     private fun updateCity(city: String) {
+        Log.e("test1", "saveScreen ${city}")
         stateFlow.value = currentStateFlow.copy(cityName = city)
     }
 
@@ -61,9 +62,9 @@ class CityViewModel @Inject constructor(
 
     // Присваевает изменяемому потоку значение cityList из памяти
     private fun addCityToList(city: String) {
-        val list = currentStateFlow.cityList.toMutableList()
+        val list = currentStateFlow.cityList
         if (!list.contains(city)) {
-            list.add(city)
+            list.put(city, 20)
             stateFlow.value = currentStateFlow.copy(cityList = list)
             saveScreen()
         }
@@ -71,10 +72,23 @@ class CityViewModel @Inject constructor(
 
     // Присваевает изменяемому потоку значение cityList из памяти
     private fun removeCityFromList(city: String) {
-        val list = currentStateFlow.cityList.toMutableList()
+        val list = currentStateFlow.cityList
         list.remove(city)
         stateFlow.value = currentStateFlow.copy(cityList = list)
         saveScreen()
+    }
+
+    private fun getByName(city: String) {
+        viewModelScope.launch {
+            val temperature = repository.getByName(city)?.weatherEntity?.main?.temp?.toInt() ?: 20
+
+            val list = currentStateFlow.cityList
+            list[city] = temperature
+
+            stateFlow.value = currentStateFlow.copy(
+                 cityList = list
+            )
+        }
     }
 
     // Метод, обрабатывающий события
@@ -84,18 +98,25 @@ class CityViewModel @Inject constructor(
             is CityEvents.SaveScreen -> saveScreen()
             is CityEvents.AddCityToList -> addCityToList(cityEvent.cityName)
             is CityEvents.RemoveCityFromList -> removeCityFromList(cityEvent.cityName)
+            is CityEvents.GetByName -> getByName(cityEvent.cityName)
+
         }
     }
 
 }
 
-data class CityState(val cityName: String = "", val cityList: List<String> = listOf("Moscow"))
+data class CityState(
+    val cityName: String = "",
+    val cityList: MutableMap<String, Int> = mutableMapOf(Pair("Moscow", 20)),
+)
+
 
 sealed class CityEvents {
     data class UpdateCity(val cityName: String) : CityEvents()
     data class AddCityToList(val cityName: String) : CityEvents()
     data class RemoveCityFromList(val cityName: String) : CityEvents()
     object SaveScreen : CityEvents()
+    data class GetByName(val cityName: String) : CityEvents()
 }
 
-data class CurrentCityInfo(val city: String, val cityList: List<String> = listOf("Moscow"))
+data class CurrentCityInfo(val city: String, val cityList: MutableMap<String, Int> = mutableMapOf(Pair("Moscow", 20)))

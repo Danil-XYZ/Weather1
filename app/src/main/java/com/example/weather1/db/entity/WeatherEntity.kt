@@ -1,5 +1,6 @@
 package com.example.weather1.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -10,6 +11,7 @@ import com.example.weather1.network.Main
 import com.example.weather1.network.Sys
 import com.example.weather1.network.Weather
 import com.example.weather1.network.Wind
+import java.util.Date
 
 @Entity(tableName = "weather")
 data class WeatherEntity(
@@ -31,7 +33,11 @@ data class WeatherEntity(
     val sys: Sys? = Sys(),
     val timezone: Int? = null,
     val name: String? = "Москва",
-    val cod: Int? = null
+    val cod: Int? = null,
+    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
+    val createdAt: Date = Date(),
+    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
+    var updatedAt: Date = Date()
 )
 
 data class FullWeather(

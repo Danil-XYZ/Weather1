@@ -2,8 +2,11 @@ package com.example.weather1.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import com.example.weather1.BuildConfig
+import com.example.weather1.db.converters.DateConverter
 import com.example.weather1.db.dao.ShortWeatherDao
 import com.example.weather1.db.dao.WeatherDao
 import com.example.weather1.db.entity.ShortWeatherEntity
@@ -17,6 +20,7 @@ import com.example.weather1.db.entity.WeatherEntity
     autoMigrations = []
 )
 
+@TypeConverters(DateConverter::class)
 abstract class AppDb: RoomDatabase(){
     companion object{
         const val DATABASE_NAME = BuildConfig.APPLICATION_ID + ".db"

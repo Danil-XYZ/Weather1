@@ -17,7 +17,7 @@ fun NavigationHost(navController: NavController){
         }
 
         composable("CityScreen"){
-            CityViewScreen()
+            CityViewScreen(navHostController = navController)
         }
 
         composable("AirScreen"){

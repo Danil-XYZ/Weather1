@@ -15,7 +15,8 @@ data class RespCurrentWeather(
     val timezone: Int? = null,
     val id: Int? = null,
     val name: String? = null,
-    val cod: Int? = null
+    val cod: Int? = null,
+    val error: RespError? = null
 )
 
 data class Coord(
@@ -66,6 +67,13 @@ data class Sys(
     var country: String? = null,
     var sunrise: Int? = null,
     var sunset: Int? = null
+
+)
+
+data class RespError(
+
+    val errorText: String? = null,
+    val errorCode: Int? = null
 
 )
 

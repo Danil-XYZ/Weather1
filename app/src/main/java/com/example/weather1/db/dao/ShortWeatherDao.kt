@@ -9,6 +9,8 @@ import com.example.weather1.db.entity.ShortWeatherEntity
 import com.example.weather1.db.entity.WeatherEntity
 import com.example.weather1.network.Weather
 
+
+// Data Access Object ShortWeatherDao
 @Dao
 interface ShortWeatherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -1,11 +1,14 @@
 package com.example.weather1.ui
 
+import android.media.MediaSession2Service.MediaNotification
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weather1.repositorys.CityRepository
 import com.example.weather1.repositorys.MainRepository
+import com.example.weather1.repositorys.RootRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -16,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RootViewModel @Inject constructor(
     private val mainRespository: MainRepository,
-    private val cityRepository: CityRepository
+    private val cityRepository: CityRepository,
+    private val rootRepository: RootRepository
 ) : ViewModel() {
     // Изменяемый поток состояний хранит RootState
     private val stateFlow = MutableStateFlow(RootState())
@@ -41,7 +45,17 @@ class RootViewModel @Inject constructor(
 
     }
 
+    fun updateNotification(): Flow<String?> {
+        return  rootRepository.getNotification()
+    }
+
+    suspend fun removeNotification() {
+        rootRepository.removeNotification()
+    }
 
 }
 
-data class RootState(val currentRoute: String = "MainScreen", val currentCity: String = "")
+data class RootState(
+    val currentRoute: String = "MainScreen",
+    val currentCity: String = ""
+)

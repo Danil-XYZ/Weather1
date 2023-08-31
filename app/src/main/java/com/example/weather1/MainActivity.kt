@@ -10,20 +10,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.weather1.ui.NavigationHost
-import com.example.weather1.ui.RootState
 import com.example.weather1.ui.RootViewModel
 import com.example.weather1.ui.components.DrawerPanel
 import com.example.weather1.ui.components.MenuItems
@@ -74,6 +69,18 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+
+                launch {
+
+                    rootViewModel.updateNotification().collectLatest {
+                        Log.e("test", "updateNotification ${it}")
+                        it?.let {
+                            scaffoldState.snackbarHostState.showSnackbar(message = it)
+                            rootViewModel.removeNotification()
+                        }
+                    }
+
+                }
             }
 
 
@@ -94,10 +101,20 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
+
+
                     Scaffold(
                         contentColor = MaterialTheme.colors.onBackground,
                         scaffoldState = scaffoldState,
                         backgroundColor = Color.Transparent,
+                        snackbarHost = { host ->
+                            Log.e("test", "SnackbarHost ${host}")
+                            SnackbarHost(
+                                hostState = host,
+                                snackbar = { Snackbar (snackbarData = it) },
+                                modifier = Modifier.offset(y = -48.dp)
+                            )
+                        },
                         topBar = {
 
                             if (rootState.currentRoute == "MainScreen") {

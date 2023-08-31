@@ -10,6 +10,8 @@ import com.example.weather1.db.entity.FullWeather
 import com.example.weather1.db.entity.WeatherEntity
 import com.example.weather1.network.Weather
 
+
+// Data Access Object WeatherDao
 @Dao
 interface WeatherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -19,9 +21,12 @@ interface WeatherDao {
     suspend fun delete(weather: WeatherEntity)
 
     @Query("SELECT * FROM weather")
-    suspend fun getAll(): WeatherEntity
+    suspend fun getAll(): List<WeatherEntity>
 
     @Transaction
     @Query("SELECT * FROM weather")
     suspend fun getFull(): List<FullWeather>
+
+    @Query("SELECT * FROM weather WHERE name =:city")
+    suspend fun getByName(city: String): FullWeather?
 }

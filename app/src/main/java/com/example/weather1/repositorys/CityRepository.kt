@@ -16,21 +16,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
-//interface ICityRepository {
-//    fun getCityFlow(): Flow<String?>
-//    suspend fun editCity(city: String)
-//    suspend fun removeCity()
-//}
-//
-//@Singleton
-//class CityRepository @Inject constructor(private val dataStore: AppDataStore) : ICityRepository {
-//    override fun getCityFlow(): Flow<String?> = dataStore.getCityFlow()
-//
-//    override suspend fun editCity(city: String) = dataStore.editCity(city)
-//
-//    override suspend fun removeCity() = dataStore.removeCity()
-//}
-
 @Singleton
 class CityRepository @Inject constructor(
     private val dataStore: AppDataStore,
@@ -43,20 +28,25 @@ class CityRepository @Inject constructor(
 
 
     suspend fun loadWeather(cityName: String): FullWeather {
+        Log.e("test", "d")
         val response = api.currentWeatherByCity(city = cityName).body() ?: RespCurrentWeather()
-        Log.e("MainRepository", "${response}")
+        Log.e("test", "${response}")
         val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CurrentCityInfo("Москва")
 
         val weather = response.toWeatherEntity()
         weatherDao.insertAll(weather)
+
         val shortWeathers = response.weather.map{
             it.toShortWeatherEntity(weatherId = response.id!!.toLong())
         }
         shortWeatherDao.insertAll(shortWeathers)
 
         dataStore.saveCity(cityStateInfo.copy(city = response.name ?: "Москва"))
+        return weatherDao.getByName(city = cityName) ?: FullWeather()
+    }
 
-        return weatherDao.getFull().firstOrNull() ?: FullWeather()
+    suspend fun getByName(city: String): FullWeather? {
+        return weatherDao.getByName(city)
     }
 
     fun getCityFlow(): Flow<CurrentCityInfo?> = dataStore.getCityFlow()

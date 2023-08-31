@@ -1,5 +1,6 @@
 package com.example.weather1.dataStore
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -44,9 +45,22 @@ class AppDataStore @Inject constructor(private val dataStore: DataStore<Preferen
     private object PreferencesKeys {
         val CITY_INFO = stringPreferencesKey("cityInfo")
         val CITY_LOCATION = stringPreferencesKey("cityLocation")
+        val NOTIFICATION = stringPreferencesKey("notification")
     }
 
+    fun getNotificationFlow(): Flow<String?> {
+        return dataStore.data.map{pref -> pref[PreferencesKeys.NOTIFICATION]}
+    }
 
+    suspend fun saveNotification(notify: String) {
+        Log.e("test", "saveNotification ${notify}")
+
+        dataStore.edit{pref -> pref[PreferencesKeys.NOTIFICATION] = notify}
+    }
+
+    suspend fun removeNotification() {
+        dataStore.edit {pref -> pref.remove(PreferencesKeys.NOTIFICATION)}
+    }
 
     fun getCityFlow(): Flow<CurrentCityInfo?> {
         return dataStore.data.map{pref -> moshi.parseObj(pref[PreferencesKeys.CITY_INFO])}

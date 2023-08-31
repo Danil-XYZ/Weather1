@@ -42,7 +42,11 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
     val permissionRequest =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             // Если получены все разрешения обнавляется геолокация
-            if (permissions.values.all { it }) mainViewModel.process(MainEvents.UpdateLocation)
+            if (permissions.values.all { it }) {
+                mainViewModel.process(MainEvents.UpdatePermission(true))
+
+            }
+            else mainViewModel.process(MainEvents.UpdatePermission(false))
         }
 
     LaunchedEffect(Unit) {
@@ -89,12 +93,14 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
 
                     is MainScreenStatus.IsLoadedWithWeather -> {
 
+                        // Температура
                         Text(
                             text = screenStatus.currentWeather.weatherEntity.main?.temp?.roundToInt()
                                 .toString(),
                             fontSize = 96.sp
                         )
 
+                        // Состояние погоды
                         Text(
                             text = "${
                                 screenStatus.currentWeather.shortWeatherEntity.firstOrNull()
