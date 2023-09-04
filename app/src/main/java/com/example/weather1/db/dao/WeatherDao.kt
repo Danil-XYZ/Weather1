@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.example.weather1.db.entity.FullWeather
 import com.example.weather1.db.entity.WeatherEntity
 import com.example.weather1.network.Weather
@@ -16,6 +17,9 @@ import com.example.weather1.network.Weather
 interface WeatherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(weather: WeatherEntity)
+
+    @Update
+    suspend fun update(weather: WeatherEntity)
 
     @Delete
     suspend fun delete(weather: WeatherEntity)
