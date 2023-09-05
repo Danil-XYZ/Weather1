@@ -34,12 +34,11 @@ class CityRepository @Inject constructor(
         val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CurrentCityInfo("Москва")
 
         val weather = response.toWeatherEntity()
-        weatherDao.insertAll(weather)
 
         val shortWeathers = response.weather.map{
             it.toShortWeatherEntity(weatherId = response.id!!.toLong())
         }
-        shortWeatherDao.insertAll(shortWeathers)
+        weatherDao.insertWithShortWeather(weather, shortWeathers)
 
         dataStore.saveCity(cityStateInfo.copy(city = response.name ?: "Москва"))
         return weatherDao.getByName(city = cityName) ?: FullWeather()

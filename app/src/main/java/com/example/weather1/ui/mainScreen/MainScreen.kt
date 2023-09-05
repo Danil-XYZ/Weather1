@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import com.example.weather1.R
 import com.example.weather1.Weather
 import com.example.weather1.WeatherState
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.Period
 import kotlin.math.roundToInt
@@ -46,8 +47,7 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
             if (permissions.values.all { it }) {
                 mainViewModel.process(MainEvents.UpdatePermission(true))
 
-            }
-            else mainViewModel.process(MainEvents.UpdatePermission(false))
+            } else mainViewModel.process(MainEvents.UpdatePermission(false))
         }
 
     LaunchedEffect(Unit) {
@@ -58,6 +58,10 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
                 Manifest.permission.ACCESS_FINE_LOCATION,
             )
         )
+
+        launch {
+            mainViewModel.initScreen()
+        }
     }
 
     Column(
@@ -105,7 +109,7 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
                         Text(
                             text = "${
                                 screenStatus.currentWeather.shortWeatherEntity.firstOrNull()
-                                ?.description?.split(" ")?.firstOrNull()
+                                    ?.description?.split(" ")?.firstOrNull()
                             } 29/16",
                             fontSize = 24.sp
                         )
