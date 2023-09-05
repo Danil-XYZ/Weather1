@@ -86,6 +86,13 @@ class MainRepository @Inject constructor(
 
                     Log.e("test", "WeatherWithCoordinates ${response.error}")
 
+                    response.name?.let {
+                        val currentCityInfo = dataStore.getCityFlow().firstOrNull()?.copy(city = it)
+                            ?: CurrentCityInfo(city = it)
+                        dataStore.saveCity(currentCityInfo)
+                    }
+
+
 //                    response.error?.errorText?.let {
 //                        dataStore.saveNotification(it)
 //                    }
@@ -93,11 +100,10 @@ class MainRepository @Inject constructor(
 //                    val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CurrentCityInfo("Москва")
 
                     val weather = response.toWeatherEntity()
-                    weatherDao.insertAll(weather)
                     val shortWeathers = response.weather.map {
                         it.toShortWeatherEntity(weatherId = response.id!!.toLong())
                     }
-                    shortWeatherDao.insertAll(shortWeathers)
+                    weatherDao.insertWithShortWeather(weather, shortWeathers)
 
 //                    dataStore.saveCity(cityStateInfo.copy(city = response.name ?: "Москва"))
 
@@ -108,9 +114,9 @@ class MainRepository @Inject constructor(
             }
             is AvailableData.WeatherWithCity -> {
                 if (Utils.noInternetConnection()) {
-                    return weatherDao.getByName(city = availableData.city) ?: availableData.defaultWeather
-                }
-                else {
+                    return weatherDao.getByName(city = availableData.city)
+                        ?: availableData.defaultWeather
+                } else {
                     val response = Utils.retryIO(
                         1,
                         error = { code, text -> RespCurrentWeather(error = RespError(text, code)) },
@@ -124,20 +130,15 @@ class MainRepository @Inject constructor(
 //                       dataStore.saveNotification(it)
 //                    }
 
-                    val weather = response.copy(id = 1).toWeatherEntity()
+                    val weather = response.toWeatherEntity()
                     Log.e("test", "weather!!!!! $weather")
-
-                    weatherDao.insertAll(weather)
-                    Log.e("test", "insertAll Completed!")
 
                     val shortWeathers = response.weather.map {
                         Log.e("test", "shortWeathers IT: ${it}")
                         it.toShortWeatherEntity(weatherId = response.id!!.toLong())
                     }
 
-                    Log.e("test", "shortWeathers $shortWeathers")
-
-                    shortWeatherDao.insertAll(shortWeathers)
+                    weatherDao.insertWithShortWeather(weather, shortWeathers)
 
                     val result = weatherDao.getFull().firstOrNull() ?: FullWeather()
                     Log.e("test", "result $result")

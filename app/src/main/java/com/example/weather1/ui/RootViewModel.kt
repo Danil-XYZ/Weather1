@@ -46,7 +46,7 @@ class RootViewModel @Inject constructor(
     }
 
     fun updateNotification(): Flow<String?> {
-        return  rootRepository.getNotification()
+        return rootRepository.getNotification()
     }
 
     suspend fun removeNotification() {

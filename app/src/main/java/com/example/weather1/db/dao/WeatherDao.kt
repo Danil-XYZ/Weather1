@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.example.weather1.db.entity.FullWeather
+import com.example.weather1.db.entity.ShortWeatherEntity
 import com.example.weather1.db.entity.WeatherEntity
 import com.example.weather1.network.Weather
 
@@ -33,4 +34,13 @@ interface WeatherDao {
 
     @Query("SELECT * FROM weather WHERE name =:city")
     suspend fun getByName(city: String): FullWeather?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertShortWeathers(shortWeathersEntity: List<ShortWeatherEntity>)
+
+    @Transaction
+    suspend fun insertWithShortWeather(weather: WeatherEntity, shortWeathersEntity: List<ShortWeatherEntity>) {
+        insertAll(weather)
+        insertShortWeathers(shortWeathersEntity)
+    }
 }

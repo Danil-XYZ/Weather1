@@ -34,47 +34,48 @@ class MainViewModel @Inject constructor(
         get() = readOnlyStateFlaw.value
 
     // Выполняется сри создании MainViewModel
-    init {
-        // Создаётся новая нить
-        viewModelScope.launch {
-            // Принимается массив координат
-            Log.e("test", "1")
 
-            cityRepository.getCityFlow().collectLatest {
+    suspend fun initScreen() {
+        // Принимается массив координат
+        Log.e("test", "1")
 
-                if (currentStateFlow.city != it?.city) {
+        cityRepository.getCityFlow().collectLatest {
 
-                    stateFlaw.value = currentStateFlow.copy(
-                        city = it?.city
-                    )
-
-                    Log.e("test", "${currentStateFlow.city}")
-
-                    val currentWeather = mainRepository.loadWeather(availableData())
-                    Log.e("test", "c: $currentWeather")
-
-                    currentWeather.error?.errorText?.let { massage->
-                        mainRepository.saveNotification(massage)
-                    }
-
-                    stateFlaw.value = currentStateFlow.copy(
-                        screenStatus = MainScreenStatus.IsLoadedWithWeather(currentWeather)
-                    )
-                }
+            if (
+                currentStateFlow.screenStatus is MainScreenStatus.IsLoadedWithWeather
+                && currentStateFlow.city != null
+                && currentStateFlow.city == it?.city
+            ) {
+                return@collectLatest
             }
+
+            stateFlaw.value = currentStateFlow.copy(city = it?.city)
+
+            Log.e("test", "${currentStateFlow.city}")
+
+            val currentWeather = mainRepository.loadWeather(availableData())
+            Log.e("test", "c: $currentWeather")
+
+            currentWeather.error?.errorText?.let { massage ->
+                mainRepository.saveNotification(massage)
+            }
+
+            stateFlaw.value = currentStateFlow.copy(
+                screenStatus = MainScreenStatus.IsLoadedWithWeather(currentWeather)
+            )
+
         }
     }
 
     private fun updateLocation() {
-        Log.e("MainViewModel", "location updated ${locationProvider.currentLocation()}")
         viewModelScope.launch {
             locationProvider.start()
             locationProvider.currentLocation()?.let {
                 Log.e("MainViewModel", "location: $it")
-                mainRepository.saveCityLocation(CityCoordinates(it.first, it.second))
                 stateFlaw.value = currentStateFlow.copy(
                     cityCoordinates = CityCoordinates(it.first, it.second)
                 )
+                mainRepository.saveCityLocation(CityCoordinates(it.first, it.second))
             }
         }
     }
