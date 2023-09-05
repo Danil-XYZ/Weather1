@@ -8,6 +8,7 @@ import androidx.room.Relation
 import com.example.weather1.network.Clouds
 import com.example.weather1.network.Coord
 import com.example.weather1.network.Main
+import com.example.weather1.network.RespError
 import com.example.weather1.network.Sys
 import com.example.weather1.network.Weather
 import com.example.weather1.network.Wind
@@ -38,6 +39,7 @@ data class WeatherEntity(
     val createdAt: Date = Date(),
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
     var updatedAt: Date = Date()
+
 )
 
 data class FullWeather(
@@ -48,4 +50,8 @@ data class FullWeather(
         entityColumn = "weatherId"
     )
     val shortWeatherEntity: List<ShortWeatherEntity> = listOf(),
+
+    @Embedded
+    val error: RespError? = null
+
 )

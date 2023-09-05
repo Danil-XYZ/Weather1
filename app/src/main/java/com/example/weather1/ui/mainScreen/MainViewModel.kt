@@ -53,6 +53,10 @@ class MainViewModel @Inject constructor(
                     val currentWeather = mainRepository.loadWeather(availableData())
                     Log.e("test", "c: $currentWeather")
 
+                    currentWeather.error?.errorText?.let { massage->
+                        mainRepository.saveNotification(massage)
+                    }
+
                     stateFlaw.value = currentStateFlow.copy(
                         screenStatus = MainScreenStatus.IsLoadedWithWeather(currentWeather)
                     )

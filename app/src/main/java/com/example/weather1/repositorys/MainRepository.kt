@@ -15,8 +15,13 @@ import com.example.weather1.network.RespError
 import com.example.weather1.ui.cityScreen.CurrentCityInfo
 import com.example.weather1.ui.mainScreen.AvailableData
 import com.example.weather1.ui.mainScreen.CityCoordinates
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -80,9 +85,10 @@ class MainRepository @Inject constructor(
                         }) ?: RespCurrentWeather()
 
                     Log.e("test", "WeatherWithCoordinates ${response.error}")
-                    response.error?.errorText?.let {
-                        dataStore.saveNotification(it)
-                    }
+
+//                    response.error?.errorText?.let {
+//                        dataStore.saveNotification(it)
+//                    }
 
 //                    val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CurrentCityInfo("Москва")
 
@@ -95,7 +101,9 @@ class MainRepository @Inject constructor(
 
 //                    dataStore.saveCity(cityStateInfo.copy(city = response.name ?: "Москва"))
 
-                    return weatherDao.getFull().firstOrNull() ?: FullWeather()
+                    val result = weatherDao.getFull().firstOrNull() ?: FullWeather()
+
+                    return result.copy(error = response.error)
                 }
             }
             is AvailableData.WeatherWithCity -> {
@@ -110,23 +118,49 @@ class MainRepository @Inject constructor(
                             api.currentWeatherByCity(availableData.city).body()
                         }) ?: RespCurrentWeather()
 
-                    Log.e("test", "WeatherWithCity ${response.error}")
-                    response.error?.errorText?.let {
-                        dataStore.saveNotification(it)
-                    }
+                    Log.e("test", "WeatherWithCity ${response}")
 
-                    val weather = response.toWeatherEntity()
+//                    response.error?.errorText?.let {
+//                       dataStore.saveNotification(it)
+//                    }
+
+                    val weather = response.copy(id = 1).toWeatherEntity()
+                    Log.e("test", "weather!!!!! $weather")
+
                     weatherDao.insertAll(weather)
+                    Log.e("test", "insertAll Completed!")
+
                     val shortWeathers = response.weather.map {
+                        Log.e("test", "shortWeathers IT: ${it}")
                         it.toShortWeatherEntity(weatherId = response.id!!.toLong())
                     }
+
+                    Log.e("test", "shortWeathers $shortWeathers")
+
                     shortWeatherDao.insertAll(shortWeathers)
 
-                    return weatherDao.getFull().firstOrNull() ?: FullWeather()
+                    val result = weatherDao.getFull().firstOrNull() ?: FullWeather()
+                    Log.e("test", "result $result")
+
+
+                    return result.copy(error = response.error)
                 }
             }
         }
     }
+
+//    fun saveNotification(massage: String){
+//        val coroutineExceptionHandler = CoroutineExceptionHandler { ctx, tr ->
+//            Log.e("test", tr.message + " " + ctx)
+//        }
+//
+//        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob() + coroutineExceptionHandler)
+//        scope.launch { dataStore.saveNotification(massage) }
+//
+//    }
+
+    suspend fun saveNotification(massage: String) = dataStore.saveNotification(massage)
+
 
     fun getCityLocationFlow(): Flow<CityCoordinates?> {
         return dataStore.getCityLocationFlow()
