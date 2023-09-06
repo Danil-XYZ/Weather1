@@ -10,6 +10,7 @@ import com.example.weather1.network.Main
 import com.example.weather1.repositorys.CityRepository
 import com.example.weather1.repositorys.MainRepository
 import com.example.weather1.ui.base.LocationProvider
+import com.example.weather1.ui.mainScreen.AvailableData.WeatherDefaults.defaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,35 +29,42 @@ class MainViewModel @Inject constructor(
     // Создаётся изменяемый поток состояний
     private val stateFlaw = MutableStateFlow(MainState())
 
+    // Создаётся неизменяемый поток данных для чтения из вне
     val readOnlyStateFlaw = stateFlaw.asStateFlow()
 
+    // Создаётся переменная типа MainState для получения данных из потока
     private val currentStateFlow: MainState
         get() = readOnlyStateFlaw.value
 
     // Выполняется сри создании MainViewModel
     init {
-        // Создаётся новая нить
+        // Запускается новая нить
         viewModelScope.launch {
-            // Принимается массив координат
-            Log.e("test", "1")
 
+            // Создаётся цикл в котором бесконечно получаются и обрабатываются данные из cityFlow
             cityRepository.getCityFlow().collectLatest {
 
+                // Если город из MainState не совпадает с городом из памяти
                 if (currentStateFlow.city != it?.city) {
 
+                    // В stateFlaw копируются данные из памяти
                     stateFlaw.value = currentStateFlow.copy(
                         city = it?.city
                     )
 
                     Log.e("test", "${currentStateFlow.city}")
 
+                    // Переменная, хранящая в себе Две таблицы и возможную ошибку
                     val currentWeather = mainRepository.loadWeather(availableData())
+
                     Log.e("test", "c: $currentWeather")
 
+                    // Если в currentWeather зранится ошибка, то показать уведомление
                     currentWeather.error?.errorText?.let { massage->
                         mainRepository.saveNotification(massage)
                     }
 
+                    // Сохраняется в поток новый статус с полученной погодой
                     stateFlaw.value = currentStateFlow.copy(
                         screenStatus = MainScreenStatus.IsLoadedWithWeather(currentWeather)
                     )
@@ -89,7 +97,7 @@ class MainViewModel @Inject constructor(
     fun availableData(): AvailableData {
         return when {
             Utils.noInternetConnection() && !currentStateFlow.isPermission -> AvailableData.WeatherDefaults
-            currentStateFlow.city != null -> AvailableData.WeatherWithCity(currentStateFlow.city!!)
+            currentStateFlow.city != null -> AvailableData.WeatherWithData(currentStateFlow.city!!)
             currentStateFlow.cityCoordinates.lat != null && currentStateFlow.cityCoordinates.lon != null ->
                 AvailableData.WeatherWithCoordinates(currentStateFlow.cityCoordinates)
 
@@ -115,19 +123,21 @@ data class MainState(
 )
 
 sealed class AvailableData {
+    val defaults = WeatherEntity(name = "Moscow", main = Main(temp = 20.0))
+
     data class WeatherWithCoordinates(
         val coordinates: CityCoordinates, val defaultWeather: FullWeather =
-            FullWeather(weatherEntity = WeatherEntity(name = "Moscow", main = Main(temp = 20.0)))
+            FullWeather(weatherEntity = defaults)
     ) : AvailableData()
 
-    data class WeatherWithCity(
+    data class WeatherWithData(
         val city: String = "Moscow", val defaultWeather: FullWeather =
-            FullWeather(weatherEntity = WeatherEntity(name = "Moscow", main = Main(temp = 20.0)))
+            FullWeather(weatherEntity = defaults)
     ) : AvailableData()
 
     object WeatherDefaults : AvailableData() {
         val defaultWeather =
-            FullWeather(weatherEntity = WeatherEntity(name = "Moscow", main = Main(temp = 20.0)))
+            FullWeather(weatherEntity = defaults)
     }
 }
 

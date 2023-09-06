@@ -47,11 +47,10 @@ class CityViewModel @Inject constructor(
     }
 
     // Сохраняет в память текущие значения
-    private fun saveScreen() {
+    private fun updateCityInfo() {
+        // В потоке записывает в CityRepository обект CurrentCityInfo
         viewModelScope.launch {
-            Log.e("test", "saveScreen ${currentStateFlow.cityList}")
             repository.saveCity(
-
                 CurrentCityInfo(
                     city = currentStateFlow.cityName,
                     cityList = currentStateFlow.cityList
@@ -66,7 +65,7 @@ class CityViewModel @Inject constructor(
         if (!list.contains(city)) {
             list.put(city, 20)
             stateFlow.value = currentStateFlow.copy(cityList = list)
-            saveScreen()
+            updateCityInfo()
         }
     }
 
@@ -75,7 +74,7 @@ class CityViewModel @Inject constructor(
         val list = currentStateFlow.cityList
         list.remove(city)
         stateFlow.value = currentStateFlow.copy(cityList = list)
-        saveScreen()
+        updateCityInfo()
     }
 
     private fun getByName(city: String) {
@@ -95,7 +94,7 @@ class CityViewModel @Inject constructor(
     fun process(cityEvent: CityEvents) {
         when (cityEvent) {
             is CityEvents.UpdateCity -> updateCity(cityEvent.cityName)
-            is CityEvents.SaveScreen -> saveScreen()
+            is CityEvents.SaveScreen -> updateCityInfo()
             is CityEvents.AddCityToList -> addCityToList(cityEvent.cityName)
             is CityEvents.RemoveCityFromList -> removeCityFromList(cityEvent.cityName)
             is CityEvents.GetByName -> getByName(cityEvent.cityName)

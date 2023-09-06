@@ -36,6 +36,7 @@ fun MainViewScreen(navController: NavController, mainViewModel: MainViewModel = 
     // Объект MainState добавленный для работы с MainViewModel
     val mainState: MainState by mainViewModel.readOnlyStateFlaw.collectAsState()
 
+    // Высота экрана
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
     // Формирование запроса разрешений

@@ -12,16 +12,9 @@ import com.example.weather1.helpers.toWeatherEntity
 import com.example.weather1.network.Api
 import com.example.weather1.network.RespCurrentWeather
 import com.example.weather1.network.RespError
-import com.example.weather1.ui.cityScreen.CurrentCityInfo
 import com.example.weather1.ui.mainScreen.AvailableData
 import com.example.weather1.ui.mainScreen.CityCoordinates
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -67,10 +60,15 @@ class MainRepository @Inject constructor(
 //
 //    }
 
+    // Принимает на вход описание данных, доступных приложению
     suspend fun loadWeather(availableData: AvailableData): FullWeather {
+
         Log.e("test", "$availableData")
+
         when (availableData) {
+            // Если нет данных, воспользоваться дефолтными значениями
             is AvailableData.WeatherDefaults -> return availableData.defaultWeather
+            // Если доступна геолокация и интернет -> получить город по координатам
             is AvailableData.WeatherWithCoordinates -> {
                 if (Utils.noInternetConnection()) return availableData.defaultWeather
                 else {
@@ -106,7 +104,8 @@ class MainRepository @Inject constructor(
                     return result.copy(error = response.error)
                 }
             }
-            is AvailableData.WeatherWithCity -> {
+            // Если нет доступа к интернету и в памяти есть данные города -> вернуть данные из памяти
+            is AvailableData.WeatherWithData -> {
                 if (Utils.noInternetConnection()) {
                     return weatherDao.getByName(city = availableData.city) ?: availableData.defaultWeather
                 }
