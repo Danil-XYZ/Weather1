@@ -1,0 +1,144 @@
+Index: app/src/main/java/com/example/weather1/repositorys/MainRepository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weather1.repositorys\r\n\r\n\r\nimport android.util.Log\r\nimport com.example.weather1.network.Api\r\nimport com.example.weather1.network.RespCurrentWeather\r\nimport javax.inject.Inject\r\nimport javax.inject.Singleton\r\n\r\n@Singleton\r\nclass MainRepository @Inject constructor(private val api: Api) {\r\n    //\r\n    suspend fun loadWeather(lat: String, lon: String): RespCurrentWeather{\r\n\r\n        val response = api.currentWeather(lat, lon)\r\n        Log.e(\"MainRepository\", \"${response.body()}\")\r\n        // Возвращает тело ответа\r\n        return response.body() ?: RespCurrentWeather()\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weather1/repositorys/MainRepository.kt b/app/src/main/java/com/example/weather1/repositorys/MainRepository.kt
+--- a/app/src/main/java/com/example/weather1/repositorys/MainRepository.kt	
++++ b/app/src/main/java/com/example/weather1/repositorys/MainRepository.kt	
+@@ -9,12 +9,7 @@
+ 
+ @Singleton
+ class MainRepository @Inject constructor(private val api: Api) {
+-    //
+-    suspend fun loadWeather(lat: String, lon: String): RespCurrentWeather{
+-
+-        val response = api.currentWeather(lat, lon)
+-        Log.e("MainRepository", "${response.body()}")
+-        // Возвращает тело ответа
+-        return response.body() ?: RespCurrentWeather()
+-    }
++    // Возвращает уже распарсеный ответ с сервера
++    suspend fun loadWeather(city: String): RespCurrentWeather =
++        api.currentWeather(city).body() ?: RespCurrentWeather()
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/weather1/ui/components/TopBar.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weather1.ui.components\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.clickable\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material.Icon\r\nimport androidx.compose.material.MaterialTheme\r\nimport androidx.compose.material.Text\r\nimport androidx.compose.material.TopAppBar\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.graphics.painter.Painter\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.text.style.TextAlign\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport com.example.weather1.R\r\n\r\n@Composable\r\nfun TopBarRow(\r\n    modifier: Modifier = Modifier,\r\n    title: String? = null,\r\n    iconPainterFirst: Painter = painterResource(id = R.drawable.ic_baseline_add_24),\r\n    iconPainterSecond: Painter? = painterResource(id = R.drawable.ic_baseline_more_vert_24),\r\n    onClickFirst: () -> Unit,\r\n    onClicSecond: (() -> Unit)? = null\r\n) {\r\n    TopAppBar(\r\n        backgroundColor = Color.Transparent,\r\n        contentColor = MaterialTheme.colors.onBackground,\r\n        contentPadding = PaddingValues(horizontal = 16.dp),\r\n        elevation = 0.dp\r\n    ) {\r\n        Row(modifier = Modifier.fillMaxWidth(),\r\n            verticalAlignment = Alignment.CenterVertically\r\n            ) {\r\n\r\n            Icon(\r\n                modifier = Modifier\r\n                    .background(\r\n                        color = Color.Transparent,\r\n                        shape = RoundedCornerShape(100)\r\n                    )\r\n                    .clip(RoundedCornerShape(100))\r\n                    .clickable { onClickFirst() },\r\n                painter = iconPainterFirst,\r\n                contentDescription = null,\r\n                tint = Color.White\r\n            )\r\n\r\n            title?.let { label ->\r\n                Text(\r\n                    text = label,\r\n                    modifier = Modifier.weight(1f),\r\n                    textAlign = TextAlign.Center,\r\n                    fontSize = 22.sp,\r\n\r\n                    )\r\n            }\r\n\r\n            iconPainterSecond?.let {\r\n                Icon(\r\n                    modifier = Modifier.clickable { onClicSecond?.invoke() },\r\n                    painter = it,\r\n                    contentDescription = null,\r\n                    tint = Color.White\r\n                )\r\n            }\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weather1/ui/components/TopBar.kt b/app/src/main/java/com/example/weather1/ui/components/TopBar.kt
+--- a/app/src/main/java/com/example/weather1/ui/components/TopBar.kt	
++++ b/app/src/main/java/com/example/weather1/ui/components/TopBar.kt	
+@@ -2,9 +2,15 @@
+ 
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.clickable
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
+ import androidx.compose.foundation.layout.PaddingValues
+ import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.Spacer
++import androidx.compose.foundation.layout.fillMaxSize
+ import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.navigationBarsPadding
++import androidx.compose.foundation.layout.statusBarsPadding
+ import androidx.compose.foundation.shape.RoundedCornerShape
+ import androidx.compose.material.Icon
+ import androidx.compose.material.MaterialTheme
+@@ -32,14 +38,16 @@
+     onClicSecond: (() -> Unit)? = null
+ ) {
+     TopAppBar(
++        modifier = Modifier.statusBarsPadding(),
+         backgroundColor = Color.Transparent,
+         contentColor = MaterialTheme.colors.onBackground,
+         contentPadding = PaddingValues(horizontal = 16.dp),
+         elevation = 0.dp
+     ) {
+-        Row(modifier = Modifier.fillMaxWidth(),
++        Row(
++            modifier = Modifier.fillMaxWidth(),
+             verticalAlignment = Alignment.CenterVertically
+-            ) {
++        ) {
+ 
+             Icon(
+                 modifier = Modifier
+@@ -74,4 +82,4 @@
+             }
+         }
+     }
+-}
+\ No newline at end of file
++}
+Index: app/src/main/java/com/example/weather1/ui/mainScreen/MainViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weather1.ui.mainScreen\r\n\r\nimport android.util.Log\r\nimport androidx.lifecycle.ViewModel\r\nimport androidx.lifecycle.viewModelScope\r\nimport com.example.weather1.network.RespCurrentWeather\r\nimport com.example.weather1.repositorys.MainRepository\r\nimport com.example.weather1.ui.base.LocationProvider\r\nimport dagger.hilt.android.lifecycle.HiltViewModel\r\nimport kotlinx.coroutines.delay\r\nimport kotlinx.coroutines.flow.MutableStateFlow\r\nimport kotlinx.coroutines.flow.asStateFlow\r\nimport kotlinx.coroutines.launch\r\nimport javax.inject.Inject\r\n\r\n@HiltViewModel\r\n\r\nclass MainViewModel @Inject constructor(\r\n    mainRepository: MainRepository,\r\n    private val locationProvider: LocationProvider\r\n) : ViewModel() {\r\n\r\n    // Создаётся изменяемый поток состояний\r\n    private val mutableState = MutableStateFlow(MainState())\r\n\r\n    val readOnlyState = mutableState.asStateFlow()\r\n\r\n    private val currentState: MainState\r\n        get() = readOnlyState.value\r\n\r\n    // Выполняется сри создании CityViewModel\r\n    init {\r\n        // Создаётся новая нить\r\n        viewModelScope.launch {\r\n            val currentWeather = mainRepository.loadWeather(\"53.03000\", \"49.3461000\")\r\n            mutableState.value = currentState.copy(screen = CheckMainScreen.MainView(currentWeather))\r\n        }\r\n    }\r\n\r\n    private fun updateLocation() {\r\n        Log.e(\"MainViewModel\", \"location updated ${locationProvider.currentLocation()}\")\r\n\r\n        locationProvider.start()\r\n        locationProvider.currentLocation()?.let {\r\n            Log.e(\"MainViewModel\", \"location: $it\")\r\n            mutableState.value = currentState.copy(lat = it.first, lon = it.second)\r\n        }\r\n    }\r\n\r\n    fun process(event: MainEvents) {\r\n        when(event){\r\n            is MainEvents.UpdateLocation -> updateLocation()\r\n        }\r\n    }\r\n\r\n}\r\n\r\n\r\ndata class MainState(\r\n    val lat: Double = 0.0,\r\n    val lon: Double = 0.0,\r\n    val screen: CheckMainScreen = CheckMainScreen.Lodaing\r\n)\r\n\r\nsealed class MainEvents {\r\n    object UpdateLocation: MainEvents()\r\n}\r\n\r\nsealed class CheckMainScreen {\r\n    object Lodaing: CheckMainScreen()\r\n    data class MainView(val currentWeather: RespCurrentWeather): CheckMainScreen()\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weather1/ui/mainScreen/MainViewModel.kt b/app/src/main/java/com/example/weather1/ui/mainScreen/MainViewModel.kt
+--- a/app/src/main/java/com/example/weather1/ui/mainScreen/MainViewModel.kt	
++++ b/app/src/main/java/com/example/weather1/ui/mainScreen/MainViewModel.kt	
+@@ -7,7 +7,6 @@
+ import com.example.weather1.repositorys.MainRepository
+ import com.example.weather1.ui.base.LocationProvider
+ import dagger.hilt.android.lifecycle.HiltViewModel
+-import kotlinx.coroutines.delay
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.asStateFlow
+ import kotlinx.coroutines.launch
+@@ -32,8 +31,10 @@
+     init {
+         // Создаётся новая нить
+         viewModelScope.launch {
+-            val currentWeather = mainRepository.loadWeather("53.03000", "49.3461000")
+-            mutableState.value = currentState.copy(screen = CheckMainScreen.MainView(currentWeather))
++            // Текущая погода = вызов метода у mainRepository
++            val currentWeather = mainRepository.loadWeather("Moscow")
++            //
++            mutableState.value = currentState.copy(screenStatus = MainScreenStatus.MainScreenActive(currentWeather))
+         }
+     }
+ 
+@@ -47,9 +48,9 @@
+         }
+     }
+ 
+-    fun process(event: MainEvents) {
++    fun process(event: MainScreenEvents) {
+         when(event){
+-            is MainEvents.UpdateLocation -> updateLocation()
++            is MainScreenEvents.UpdateLocation -> updateLocation()
+         }
+     }
+ 
+@@ -59,14 +60,14 @@
+ data class MainState(
+     val lat: Double = 0.0,
+     val lon: Double = 0.0,
+-    val screen: CheckMainScreen = CheckMainScreen.Lodaing
++    val screenStatus: MainScreenStatus = MainScreenStatus.MainScreenLodaing
+ )
+ 
+-sealed class MainEvents {
+-    object UpdateLocation: MainEvents()
++sealed class MainScreenEvents {
++    object UpdateLocation: MainScreenEvents()
+ }
+ 
+-sealed class CheckMainScreen {
+-    object Lodaing: CheckMainScreen()
+-    data class MainView(val currentWeather: RespCurrentWeather): CheckMainScreen()
++sealed class MainScreenStatus {
++    object MainScreenLodaing: MainScreenStatus()
++    data class MainScreenActive(val currentWeather: RespCurrentWeather): MainScreenStatus()
+ }
+\ No newline at end of file

@@ -1,0 +1,47 @@
+Index: app/src/main/java/com/example/weather1/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.weather1\r\n\r\nimport android.annotation.SuppressLint\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.viewModels\r\nimport androidx.compose.foundation.Image\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.material.MaterialTheme\r\nimport androidx.compose.material.Scaffold\r\nimport androidx.compose.material.ScaffoldState\r\nimport androidx.compose.material.rememberScaffoldState\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.layout.ContentScale\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.core.view.WindowCompat\r\nimport androidx.navigation.compose.rememberNavController\r\nimport androidx.navigation.findNavController\r\nimport com.example.weather1.ui.NavigationHost\r\nimport com.example.weather1.ui.RootState\r\nimport com.example.weather1.ui.RootViewModel\r\nimport com.example.weather1.ui.components.DrawerPanel\r\nimport com.example.weather1.ui.components.MenuItems\r\nimport com.example.weather1.ui.components.TopBarRow\r\nimport com.example.weather1.ui.mainScreen.MainViewScreen\r\nimport com.example.weather1.ui.theme.Weather1Theme\r\nimport com.google.accompanist.systemuicontroller.rememberSystemUiController\r\nimport dagger.hilt.android.AndroidEntryPoint\r\nimport kotlinx.coroutines.flow.collectLatest\r\nimport kotlinx.coroutines.launch\r\n\r\n@AndroidEntryPoint\r\nclass MainActivity : ComponentActivity() {\r\n\r\n    val vm: RootViewModel by viewModels()\r\n\r\n    @SuppressLint(\"UnusedMaterialScaffoldPaddingParameter\")\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n\r\n        WindowCompat.setDecorFitsSystemWindows(window, false)\r\n\r\n        super.onCreate(savedInstanceState)\r\n        setContent {\r\n\r\n            val state: RootState by vm.state.collectAsState()\r\n            val scope = rememberCoroutineScope()\r\n            val scaffoldState = rememberScaffoldState()\r\n            val navController = rememberNavController()\r\n\r\n            val systemUiController = rememberSystemUiController()\r\n            SideEffect {\r\n                systemUiController.setStatusBarColor(color = Color.Transparent)\r\n            }\r\n\r\n            LaunchedEffect(key1 = Unit) {\r\n                launch {\r\n                    navController.currentBackStackEntryFlow.collectLatest {\r\n                        //vm.updateRout(it.destination.route)\r\n                        it.destination.route?.let { it1 -> vm.updateRout(it1) }\r\n                    }\r\n                }\r\n            }\r\n\r\n            Weather1Theme {\r\n\r\n                Box(\r\n                    modifier = Modifier\r\n                        .fillMaxSize()\r\n                        .background(Color.Black)\r\n                ) {\r\n\r\n                    if (state.currentRoute == \"MainScreen\") {\r\n                        Image(\r\n                            painter = painterResource(id = R.drawable.img),\r\n                            contentDescription = null,\r\n                            contentScale = ContentScale.FillHeight,\r\n                            modifier = Modifier.fillMaxSize()\r\n                        )\r\n                    }\r\n\r\n                    Scaffold(\r\n                        contentColor = MaterialTheme.colors.onBackground,\r\n                        scaffoldState = scaffoldState,\r\n                        backgroundColor = Color.Transparent,\r\n                        topBar = {\r\n\r\n                            if (state.currentRoute == \"MainScreen\") {\r\n                                TopBarRow(\r\n                                    onClickFirst = {\r\n                                        navController.navigate(route = \"CityScreen\")\r\n                                    },\r\n                                    onClicSecond = {\r\n                                        scope.launch { scaffoldState.drawerState.open() }\r\n                                    },\r\n                                    title = \"Moscow\"\r\n                                )\r\n                            } else {\r\n                                TopBarRow(\r\n                                    onClickFirst = {\r\n                                        navController.popBackStack()\r\n                                    },\r\n                                    iconPainterSecond = null,\r\n                                    title = null,\r\n                                    iconPainterFirst = painterResource(id = R.drawable.baseline_keyboard_backspace_24)\r\n                                )\r\n                            }\r\n\r\n                        },\r\n                        drawerContent = {\r\n                            DrawerPanel(\r\n                                listOf(MenuItems.Settings, MenuItems.Share),\r\n                                MenuItems.Settings\r\n                            ) {\r\n                                scope.launch {\r\n                                    scaffoldState.drawerState.close()\r\n                                }\r\n                            }\r\n                        }\r\n                    ) {\r\n                        NavigationHost(navController = navController)\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/weather1/MainActivity.kt b/app/src/main/java/com/example/weather1/MainActivity.kt
+--- a/app/src/main/java/com/example/weather1/MainActivity.kt	
++++ b/app/src/main/java/com/example/weather1/MainActivity.kt	
+@@ -18,7 +18,6 @@
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.layout.ContentScale
+ import androidx.compose.ui.res.painterResource
+-import androidx.core.view.WindowCompat
+ import androidx.navigation.compose.rememberNavController
+ import androidx.navigation.findNavController
+ import com.example.weather1.ui.NavigationHost
+@@ -29,7 +28,6 @@
+ import com.example.weather1.ui.components.TopBarRow
+ import com.example.weather1.ui.mainScreen.MainViewScreen
+ import com.example.weather1.ui.theme.Weather1Theme
+-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+ import dagger.hilt.android.AndroidEntryPoint
+ import kotlinx.coroutines.flow.collectLatest
+ import kotlinx.coroutines.launch
+@@ -41,9 +39,6 @@
+ 
+     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+     override fun onCreate(savedInstanceState: Bundle?) {
+-
+-        WindowCompat.setDecorFitsSystemWindows(window, false)
+-
+         super.onCreate(savedInstanceState)
+         setContent {
+ 
+@@ -52,10 +47,6 @@
+             val scaffoldState = rememberScaffoldState()
+             val navController = rememberNavController()
+ 
+-            val systemUiController = rememberSystemUiController()
+-            SideEffect {
+-                systemUiController.setStatusBarColor(color = Color.Transparent)
+-            }
+ 
+             LaunchedEffect(key1 = Unit) {
+                 launch {
