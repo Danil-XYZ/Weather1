@@ -5,12 +5,11 @@ import com.example.weather1.dataStore.AppDataStore
 import com.example.weather1.db.dao.ShortWeatherDao
 import com.example.weather1.db.dao.WeatherDao
 import com.example.weather1.db.entity.FullWeather
-import com.example.weather1.helpers.Utils
 import com.example.weather1.helpers.toShortWeatherEntity
 import com.example.weather1.helpers.toWeatherEntity
 import com.example.weather1.network.Api
 import com.example.weather1.network.RespCurrentWeather
-import com.example.weather1.ui.cityScreen.CurrentCityInfo
+import com.example.weather1.ui.cityScreen.CityState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -31,7 +30,7 @@ class CityRepository @Inject constructor(
         Log.e("test", "d")
         val response = api.currentWeatherByCity(city = cityName).body() ?: RespCurrentWeather()
         Log.e("test", "${response}")
-        val cityStateInfo = dataStore.getCityFlow().firstOrNull() ?: CurrentCityInfo("Москва")
+        val cityState = dataStore.getCityFlow().firstOrNull() ?: CityState("Москва")
 
         val weather = response.toWeatherEntity()
 
@@ -40,7 +39,7 @@ class CityRepository @Inject constructor(
         }
         weatherDao.insertWithShortWeather(weather, shortWeathers)
 
-        dataStore.saveCity(cityStateInfo.copy(city = response.name ?: "Москва"))
+        dataStore.saveCity(cityState.copy(cityName = response.name ?: "Москва"))
         return weatherDao.getByName(city = cityName) ?: FullWeather()
     }
 
@@ -48,8 +47,8 @@ class CityRepository @Inject constructor(
         return weatherDao.getByName(city)
     }
 
-    fun getCityFlow(): Flow<CurrentCityInfo?> = dataStore.getCityFlow()
+    fun getCityFlow(): Flow<CityState?> = dataStore.getCityFlow()
 
-    suspend fun saveCity(city: CurrentCityInfo) = dataStore.saveCity(city)
+    suspend fun saveCity(city: CityState) = dataStore.saveCity(city)
 
 }

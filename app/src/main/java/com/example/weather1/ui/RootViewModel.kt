@@ -1,6 +1,5 @@
 package com.example.weather1.ui
 
-import android.media.MediaSession2Service.MediaNotification
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,25 +22,25 @@ class RootViewModel @Inject constructor(
     private val rootRepository: RootRepository
 ) : ViewModel() {
     // Изменяемый поток состояний хранит RootState
-    private val stateFlow = MutableStateFlow(RootState())
+    private val rootStateFlow = MutableStateFlow(RootState())
 
-    val readOnlystate = stateFlow.asStateFlow()
+    val readOnlystate = rootStateFlow.asStateFlow()
 
     private val currentStateFlow
-        get() = stateFlow.value
+        get() = rootStateFlow.value
 
     init {
         viewModelScope.launch {
             // При загрузке приложения извлекает из памяти название города
             cityRepository.getCityFlow().collectLatest {
-                stateFlow.value = currentStateFlow.copy(currentCity = it?.city ?: "Error")
+                rootStateFlow.value = currentStateFlow.copy(currentCity = it?.cityName ?: "Error")
             }
         }
     }
 
     fun updateRout(route: String) {
-        stateFlow.value = currentStateFlow.copy(currentRoute = route)
-        Log.e("MainActivity", "RootUpdated ${stateFlow.value}")
+        rootStateFlow.value = currentStateFlow.copy(currentRoute = route)
+        Log.e("MainActivity", "RootUpdated ${rootStateFlow.value}")
 
     }
 

@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,15 +54,13 @@ fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostContro
     //
     val lifecycle: LifecycleOwner = LocalLifecycleOwner.current
 
-
-
     // Сробатывает при выходе из композиции
     DisposableEffect(Unit) {
 
         val observer = LifecycleEventObserver { lifecycleOwner, event ->
             when (event) {
                 Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_DESTROY -> {
-                    cityViewModel.process(CityEvents.SaveScreen)
+                    cityViewModel.process(CityEvents.UpdateCityInfo)
                 }
             }
         }
@@ -87,21 +87,22 @@ fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostContro
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        //BasicTextField("Enter location", { })
+        val textState = remember { mutableStateOf("") }
+
         TextField(
             modifier = Modifier
                 .padding(0.dp)
                 .fillMaxWidth()
                 .clip(CircleShape)
                 .background(Color.Gray),
-            value = cityState.cityName,
+            value = textState.value,
             // При изменении вызывет CityEvents.UpdateCity(city)
-            onValueChange = { cityViewModel.process(CityEvents.UpdateCity(it)) },
+            onValueChange = { textState.value = it },
             leadingIcon = {
                 Icon(
                     modifier = Modifier.clickable {
-                        cityViewModel.process(CityEvents.AddCityToList(cityState.cityName))
-
+                        cityViewModel.process(CityEvents.AddCityToList(textState.value))
+                        cityViewModel.process(CityEvents.UpdateCityInfo)
                     },
                     painter = painterResource(id = R.drawable.baseline_search_24),
                     contentDescription = null,
@@ -133,10 +134,12 @@ fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostContro
                         .combinedClickable(
                             onClick = {
                                 cityViewModel.process(CityEvents.UpdateCity(it.key))
+                                cityViewModel.process(CityEvents.UpdateCityInfo)
                                 navHostController.popBackStack()
                             },
                             onLongClick = {
                                 cityViewModel.process(CityEvents.RemoveCityFromList(it.key))
+                                cityViewModel.process(CityEvents.UpdateCityInfo)
                             },
                         ),
                     backgroundColor = Color(0xFF3BA4E8),

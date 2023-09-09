@@ -12,7 +12,7 @@ import com.example.weather1.helpers.toWeatherEntity
 import com.example.weather1.network.Api
 import com.example.weather1.network.RespCurrentWeather
 import com.example.weather1.network.RespError
-import com.example.weather1.ui.cityScreen.CurrentCityInfo
+import com.example.weather1.ui.cityScreen.CityState
 import com.example.weather1.ui.mainScreen.AvailableData
 import com.example.weather1.ui.mainScreen.CityCoordinates
 import kotlinx.coroutines.flow.Flow
@@ -87,8 +87,8 @@ class MainRepository @Inject constructor(
                     Log.e("test", "WeatherWithCoordinates ${response.error}")
 
                     response.name?.let {
-                        val currentCityInfo = dataStore.getCityFlow().firstOrNull()?.copy(city = it)
-                            ?: CurrentCityInfo(city = it)
+                        val currentCityInfo = dataStore.getCityFlow().firstOrNull()?.copy(cityName = it)
+                            ?: CityState(cityName = it)
                         dataStore.saveCity(currentCityInfo)
                     }
 

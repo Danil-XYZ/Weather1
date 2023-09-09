@@ -1,7 +1,6 @@
 package com.example.weather1.ui.cityScreen
 
 import android.util.Log
-import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weather1.repositorys.CityRepository
@@ -35,7 +34,7 @@ class CityViewModel @Inject constructor(
                 collectedLatest?.let {
                     //Присваеваем потоку состояния полученные данные
                     stateFlow.value =
-                        currentStateFlow.copy(cityName = it.city, cityList = it.cityList)
+                        currentStateFlow.copy(cityName = it.cityName, cityList = it.cityList)
                 }
             }
         }
@@ -52,8 +51,8 @@ class CityViewModel @Inject constructor(
         // В потоке записывает в CityRepository обект CurrentCityInfo
         viewModelScope.launch {
             repository.saveCity(
-                CurrentCityInfo(
-                    city = currentStateFlow.cityName,
+                CityState(
+                    cityName = currentStateFlow.cityName,
                     cityList = currentStateFlow.cityList
                 )
             )
@@ -95,7 +94,7 @@ class CityViewModel @Inject constructor(
     fun process(cityEvent: CityEvents) {
         when (cityEvent) {
             is CityEvents.UpdateCity -> updateCity(cityEvent.cityName)
-            is CityEvents.SaveScreen -> updateCityInfo()
+            is CityEvents.UpdateCityInfo -> updateCityInfo()
             is CityEvents.AddCityToList -> addCityToList(cityEvent.cityName)
             is CityEvents.RemoveCityFromList -> removeCityFromList(cityEvent.cityName)
             is CityEvents.GetByName -> getByName(cityEvent.cityName)
@@ -115,8 +114,6 @@ sealed class CityEvents {
     data class UpdateCity(val cityName: String) : CityEvents()
     data class AddCityToList(val cityName: String) : CityEvents()
     data class RemoveCityFromList(val cityName: String) : CityEvents()
-    object SaveScreen : CityEvents()
+    object UpdateCityInfo : CityEvents()
     data class GetByName(val cityName: String) : CityEvents()
 }
-
-data class CurrentCityInfo(val city: String, val cityList: MutableMap<String, Int> = mutableMapOf(Pair("Moscow", 20)))

@@ -27,10 +27,10 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Создаётся изменяемый поток состояний
-    private val stateFlaw = MutableStateFlow(MainState())
+    private val mainStateFlaw = MutableStateFlow(MainState())
 
     // Создаётся неизменяемый поток данных для чтения из вне
-    val readOnlyStateFlaw = stateFlaw.asStateFlow()
+    val readOnlyStateFlaw = mainStateFlaw.asStateFlow()
 
     // Создаётся переменная типа MainState для получения данных из потока
     private val currentStateFlow: MainState
@@ -49,14 +49,14 @@ class MainViewModel @Inject constructor(
             if (
                 currentStateFlow.screenStatus is MainScreenStatus.IsLoadedWithWeather
                 && currentStateFlow.city != null
-                && currentStateFlow.city == it?.city
+                && currentStateFlow.city == it?.cityName
             ) {
                 return@collectLatest
             }
 
             // В stateFlaw копируются данные из памяти
-            stateFlaw.value = currentStateFlow.copy(
-                city = it?.city
+            mainStateFlaw.value = currentStateFlow.copy(
+                city = it?.cityName
             )
 
             Log.e("test", "${currentStateFlow.city}")
@@ -72,7 +72,7 @@ class MainViewModel @Inject constructor(
             }
 
             // Сохраняется в поток новый статус с полученной погодой
-            stateFlaw.value = currentStateFlow.copy(
+            mainStateFlaw.value = currentStateFlow.copy(
                 screenStatus = MainScreenStatus.IsLoadedWithWeather(currentWeather)
             )
         }
@@ -84,7 +84,7 @@ class MainViewModel @Inject constructor(
             locationProvider.start()
             locationProvider.currentLocation()?.let {
                 Log.e("MainViewModel", "location: $it")
-                stateFlaw.value = currentStateFlow.copy(
+                mainStateFlaw.value = currentStateFlow.copy(
                     cityCoordinates = CityCoordinates(it.first, it.second)
                 )
                 mainRepository.saveCityLocation(CityCoordinates(it.first, it.second))
@@ -112,11 +112,12 @@ class MainViewModel @Inject constructor(
 
     private fun updatePermission(isPermission: Boolean) {
         if (isPermission) updateLocation()
-        stateFlaw.value = currentStateFlow.copy(
+        mainStateFlaw.value = currentStateFlow.copy(
             isPermission = isPermission
         )
     }
 }
+
 
 data class CityCoordinates(val lat: Double? = null, val lon: Double? = null)
 
