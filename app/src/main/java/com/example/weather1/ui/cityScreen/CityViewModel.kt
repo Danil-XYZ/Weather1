@@ -1,6 +1,7 @@
 package com.example.weather1.ui.cityScreen
 
 import android.util.Log
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weather1.repositorys.CityRepository

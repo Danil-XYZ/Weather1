@@ -11,6 +11,7 @@ import com.example.weather1.db.entity.FullWeather
 import com.example.weather1.db.entity.ShortWeatherEntity
 import com.example.weather1.db.entity.WeatherEntity
 import com.example.weather1.network.Weather
+import kotlinx.coroutines.flow.Flow
 
 
 // Data Access Object WeatherDao
@@ -27,6 +28,15 @@ interface WeatherDao {
 
     @Query("SELECT * FROM weather")
     suspend fun getAll(): List<WeatherEntity>
+
+    @Query(
+        """
+        SELECT * FROM weather 
+        ORDER BY updatedAt DESC 
+        LIMIT 1
+    """
+    )
+    fun findLastFullWeather(): Flow<FullWeather?>
 
     @Transaction
     @Query("SELECT * FROM weather")
