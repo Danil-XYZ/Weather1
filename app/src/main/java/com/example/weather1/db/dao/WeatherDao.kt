@@ -42,8 +42,15 @@ interface WeatherDao {
     @Query("SELECT * FROM weather")
     suspend fun getFull(): List<FullWeather>
 
+    @Transaction
+    @Query("SELECT * FROM weather")
+    fun getFlowFull(): Flow<List<FullWeather>?>
+
     @Query("SELECT * FROM weather WHERE name =:city")
     suspend fun getByName(city: String): FullWeather?
+
+    @Query("SELECT name FROM weather")
+    suspend fun getNames(): List<String>?
 
     @Query("SELECT * FROM weather WHERE id =:id")
     suspend fun getById(id: Long): FullWeather?

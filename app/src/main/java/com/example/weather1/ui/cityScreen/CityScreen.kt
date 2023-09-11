@@ -40,14 +40,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.weather1.R
 import com.example.weather1.Weather
 import com.example.weather1.WeatherState
+import com.example.weather1.db.dao.WeatherDao
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostController: NavHostController) {
+fun CityViewScreen(
+    cityViewModel: CityViewModel = hiltViewModel(),
+    navHostController: NavHostController,
+) {
 
     // Состояние загружающееся из cityViewModel
     val cityState: CityState by cityViewModel.readOnlyStateFlaw.collectAsState()
@@ -95,14 +106,16 @@ fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostContro
                 .fillMaxWidth()
                 .clip(CircleShape)
                 .background(Color.Gray),
-            value = textState.value,
+            value = cityState.cityName,
             // При изменении вызывет CityEvents.UpdateCity(city)
-            onValueChange = { textState.value = it },
+            onValueChange = {
+                cityViewModel.process(CityEvents.UpdateCity(it))
+            },
             leadingIcon = {
                 Icon(
                     modifier = Modifier.clickable {
-                        cityViewModel.process(CityEvents.AddCityToList(textState.value))
-                        cityViewModel.process(CityEvents.UpdateCityInfo)
+                        //cityViewModel.process(CityEvents.AddCityToList(textState.value))
+                        cityViewModel.process(CityEvents.LoadWeather)
                     },
                     painter = painterResource(id = R.drawable.baseline_search_24),
                     contentDescription = null,
@@ -120,11 +133,17 @@ fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostContro
 
 
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+
             Log.e("test", "${cityState.cityList}")
 
-            cityState.cityList.forEach {
+            val coroutineExceptionHandler = CoroutineExceptionHandler { ctx, tr ->
+                Log.e("test", tr.message + " " + ctx)
+            }
 
-                cityViewModel.process(CityEvents.GetByName(it.key))
+
+            cityState.cityLists.forEach() {
+
+                cityViewModel.process(CityEvents.GetByName(it))
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -133,13 +152,11 @@ fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostContro
                         .fillMaxWidth()
                         .combinedClickable(
                             onClick = {
-                                cityViewModel.process(CityEvents.UpdateCity(it.key))
-                                cityViewModel.process(CityEvents.UpdateCityInfo)
+                                cityViewModel.process(CityEvents.UpdateCity(it))
                                 navHostController.popBackStack()
                             },
                             onLongClick = {
-                                cityViewModel.process(CityEvents.RemoveCityFromList(it.key))
-                                cityViewModel.process(CityEvents.UpdateCityInfo)
+                                cityViewModel.process(CityEvents.RemoveCityFromList(it))
                             },
                         ),
                     backgroundColor = Color(0xFF3BA4E8),
@@ -154,7 +171,7 @@ fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostContro
                         Column {
 
                             Row {
-                                Text(text = it.key)
+                                Text(text = it)
 
                                 Icon(
                                     painter = painterResource(id = R.drawable.baseline_location_on_24),
@@ -168,7 +185,7 @@ fun CityViewScreen(cityViewModel: CityViewModel = hiltViewModel(), navHostContro
                         }
 
                         Text(
-                            text = it.value.toString(),
+                            text = it,
                             fontSize = 32.sp,
                             textAlign = TextAlign.End,
                             modifier = Modifier.fillMaxWidth()

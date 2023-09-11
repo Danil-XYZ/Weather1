@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.weather1.ui.cityScreen.CityState
 import com.example.weather1.ui.mainScreen.CityCoordinates
@@ -46,6 +47,7 @@ class AppDataStore @Inject constructor(private val dataStore: DataStore<Preferen
         val CITY_INFO = stringPreferencesKey("cityInfo")
         val CITY_LOCATION = stringPreferencesKey("cityLocation")
         val NOTIFICATION = stringPreferencesKey("notification")
+        val WEATHER_ID = longPreferencesKey("weatherId")
     }
 
     fun getNotificationFlow(): Flow<String?> {
@@ -78,6 +80,15 @@ class AppDataStore @Inject constructor(private val dataStore: DataStore<Preferen
     suspend fun saveCityLocation(location: CityCoordinates?) {
         dataStore.edit{pref -> pref[PreferencesKeys.CITY_LOCATION] = moshi.toJson(location)}
     }
+
+    fun getWeatherId(): Flow<Long?>{
+        return dataStore.data.map{pref -> pref[PreferencesKeys.WEATHER_ID]}
+    }
+
+    suspend fun saveWeatherId(weatherId: Long) {
+        dataStore.edit{pref -> pref[PreferencesKeys.WEATHER_ID] = weatherId}
+    }
+
 
 }
 
